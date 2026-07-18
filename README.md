@@ -12,7 +12,15 @@ registration itself (roughly $10–15/year instead of ~$200/year on Squarespace)
 |---|---|
 | `index.html` | The whole homepage — nav, hero, work portfolio, about, shop, contact |
 | `styles.css` | Design tokens (colors, fonts, spacing) and all component styles |
-| `images/` | Put your photos here (see below) |
+| `images/` | Curated photos used by the homepage, plus `logo.png` |
+| `images/originals/` | Full archive of all 248 photos from the old Squarespace site, organized by page |
+| `MIGRATION.md` | Every page's text, all shop prices/descriptions, and which photos belong to which page |
+| `content.json` / `imgmap.json` | Machine-readable versions of the migrated text and page→photo map |
+
+All photos, text and prices from the old Squarespace site were pulled into this
+repo on 2026-07-18, so nothing is lost when the subscription is cancelled. The
+homepage already uses a curated selection; `MIGRATION.md` is the checklist for
+rebuilding the remaining portfolio and shop pages from the archive.
 
 ## Previewing locally
 
@@ -25,20 +33,20 @@ python3 -m http.server 8000
 
 ## Adding your photos
 
-The hero, the six work cards, and the about portrait currently show striped
-placeholder boxes. Each one has an HTML comment next to it showing the exact
-`<img>` tag to swap in. The short version:
+The hero, all six work cards, and the three shirt photos already use real
+images pulled from your old site (stored in `images/`). Every image is a local
+file — nothing loads from Squarespace anymore, so the homepage will keep working
+after you cancel.
 
-1. Drop photos into `images/` (e.g. `hero.jpg`, `portrait.jpg`, `seating.jpg`, …).
-2. In `index.html`, replace each `<div class="img-slot">…</div>` with:
-   ```html
-   <img src="images/hero.jpg" alt="Describe the piece" style="width:100%;height:100%;object-fit:cover">
-   ```
+The **one** remaining placeholder is the About portrait — the old site never had
+a photo of you, so it shows a striped box. To add one:
 
-**Important:** the three shirt photos in the Shop section currently load from
-Squarespace's CDN (`images.squarespace-cdn.com`). **Download those images and
-move them into `images/` before cancelling Squarespace**, or they will break
-when the subscription ends.
+1. Drop a photo into `images/` (e.g. `portrait.jpg`).
+2. In `index.html`, find the `<div class="img-slot">Add a photo of Max in the shop</div>`
+   and replace it with the `<img>` tag shown in the comment right above it.
+
+Plenty more of your photos are archived in `images/originals/` if you'd rather
+use one of those.
 
 ## Publishing (free hosting)
 
