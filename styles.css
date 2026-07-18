@@ -109,8 +109,10 @@ figure { margin: 0; }
   backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-divider);
 }
 .mg-navrow { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; }
-.mg-logo { height: 48px; width: auto; display: block; }
-@media (max-width: 620px) { .mg-logo { height: 38px; } }
+.mg-brand { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; }
+.mg-logo { height: 50px; width: auto; display: block; }
+.mg-brand-text { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: clamp(17px, 2vw, 23px); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.05; white-space: nowrap; }
+@media (max-width: 620px) { .mg-logo { height: 40px; } .mg-brand { gap: 10px; } .mg-brand-text { font-size: 15px; white-space: normal; max-width: 8ch; } }
 .mg-navlinks { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 600; }
 .mg-navlinks a { color: var(--color-text); text-decoration: none; }
 .mg-navlinks a:hover { color: var(--color-accent-700); }
