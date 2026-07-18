@@ -48,6 +48,46 @@ a photo of you, so it shows a striped box. To add one:
 Plenty more of your photos are archived in `images/originals/` if you'd rather
 use one of those.
 
+## The store
+
+`shop.html` is the store index (products grouped by category); each product has
+its own page, `shop-<product>.html` (e.g. `shop-check-the-logs.html`), generated
+with photos, price, description, and size/color/wood selectors where relevant.
+
+**Checkout runs on PayPal, wired through one file: `shop.js`.**
+
+- Right now `PAYPAL_MERCHANT` in `shop.js` is empty, so every "Add to cart"
+  button falls back to opening a **pre-filled order email** to
+  `max@maxgrossman.com` (with the item, size/color, and price). The shop is
+  usable today with zero setup.
+- To turn on real PayPal checkout, put your PayPal account email in that one line:
+
+  ```js
+  const PAYPAL_MERCHANT = "you@your-paypal-email.com";
+  ```
+
+  Every button then adds the item — with the chosen size/color/wood — to your
+  PayPal cart and checks out through PayPal. Same PayPal account as your market
+  (Zettle) POS, so all sales land in one place. No monthly fee; PayPal takes its
+  standard per-sale cut.
+
+### Inventory sync with your PayPal Zettle POS
+
+Honest answer: a hand-built static site like this **can't do automatic two-way
+stock sync** with Zettle — that needs a live backend talking to the Zettle API,
+which a plain HTML site doesn't have. Two realistic paths:
+
+1. **Made-to-order (recommended here).** Almost everything in the shop — shirts,
+   spoons, vases, kits, toys — is made to order, so there's no fixed stock to
+   sync. Leave those as always-available. For genuine one-offs (the Leaf Table,
+   a specific finished piece), just remove or mark that product page sold when it
+   goes, on whichever channel sells it. Low volume, quick to do by hand.
+2. **A platform with a native Zettle integration** (WooCommerce via the official
+   "PayPal Zettle for WooCommerce" plugin, or Wix/BigCommerce). Those *do* sync
+   stock with Zettle automatically — but they reintroduce a hosted platform (and
+   usually a monthly cost), which is the thing we're moving away from. Worth it
+   only if you carry real finished-goods inventory and want it tracked live.
+
 ## Instagram feed
 
 The "Fresh from the workshop" section on the homepage is a **live Behold feed**
