@@ -10,7 +10,7 @@
  * Until this is filled in, the buttons fall back to opening a pre-filled order
  * email to max@maxgrossman.com, so the shop still works today.
  */
-const PAYPAL_MERCHANT = ""; // ← put your PayPal email here to enable PayPal checkout
+const PAYPAL_MERCHANT = "maxgrossman@outlook.com"; // ← your PayPal email; enables PayPal checkout
 const ORDER_EMAIL = "max@maxgrossman.com";
 
 document.querySelectorAll("form.pp-form").forEach((form) => {
