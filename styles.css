@@ -102,15 +102,15 @@ figure { margin: 0; }
 .tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
 
 /* — layout — */
-.mg-wrap { max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 56px); }
+.mg-wrap { max-width: none; margin: 0; padding: 0 clamp(20px, 4vw, 72px); }
 .mg-nav {
   position: sticky; top: 0; z-index: 20;
   background: color-mix(in srgb, var(--color-bg) 88%, transparent);
   backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-divider);
 }
 .mg-navrow { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; }
-.mg-logo { height: 38px; width: auto; display: block; }
-@media (max-width: 620px) { .mg-logo { height: 30px; } }
+.mg-logo { height: 48px; width: auto; display: block; }
+@media (max-width: 620px) { .mg-logo { height: 38px; } }
 .mg-navlinks { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 600; }
 .mg-navlinks a { color: var(--color-text); text-decoration: none; }
 .mg-navlinks a:hover { color: var(--color-accent-700); }
