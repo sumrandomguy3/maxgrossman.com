@@ -50,22 +50,21 @@ use one of those.
 
 ## Instagram feed
 
-The "Fresh from the workshop" section on the homepage currently shows a
-hand-picked grid of your past posts. To make it **update automatically every
-time you post to Instagram**, connect a free feed widget — Instagram itself
-requires a one-time login to authorize any live feed, so this is a five-minute
-setup you do once:
+The "Fresh from the workshop" section on the homepage is a **live Behold feed**
+([behold.so](https://behold.so), feed id `XoXLpXGcmHFl1GwgqtGf`) — it updates on
+its own every time you post to `@mcgrossman`, no code changes needed.
 
-1. Go to [behold.so](https://behold.so) and create a free account (the free tier
-   shows a live feed that refreshes on its own).
-2. Connect your `@mcgrossman` Instagram account and create a feed. Behold gives
-   you two lines: a `<script …>` tag and a `<behold-widget feed-id="…">` tag.
-3. In `index.html`, find the `<!-- INSTAGRAM -->` section and replace the whole
-   `<div class="mg-iggrid"> … </div>` block with the `<behold-widget …>` line,
-   and paste the `<script …>` line just before `</body>` at the bottom of the file.
+- The widget itself is the `<behold-widget feed-id="…">` tag inside the
+  `<!-- INSTAGRAM -->` section of `index.html`; its loader `<script>` sits just
+  before `</body>`.
+- To change how it looks (columns, number of posts, spacing), adjust the feed in
+  your Behold dashboard — the changes flow through automatically.
+- To point it at a different account, create a new feed in Behold and swap the
+  `feed-id`.
 
-That's it — from then on the section mirrors your Instagram automatically.
-(LightWidget and SnapWidget work the same way if you prefer one of those.)
+Note: the feed only renders where the browser can reach `w.behold.so`, so it will
+look empty in a purely offline preview but populates normally once the site is
+published.
 
 ## Publishing (free hosting)
 

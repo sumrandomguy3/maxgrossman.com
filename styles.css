@@ -109,8 +109,8 @@ figure { margin: 0; }
   backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-divider);
 }
 .mg-navrow { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; }
-.mg-logo { height: 18px; width: auto; display: block; }
-@media (max-width: 620px) { .mg-logo { height: 16px; } }
+.mg-logo { height: 27px; width: auto; display: block; }
+@media (max-width: 620px) { .mg-logo { height: 22px; } }
 .mg-navlinks { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 600; }
 .mg-navlinks a { color: var(--color-text); text-decoration: none; }
 .mg-navlinks a:hover { color: var(--color-accent-700); }

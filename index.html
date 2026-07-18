@@ -205,23 +205,8 @@
         <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener" class="btn btn-secondary" style="text-decoration:none">@mcgrossman on Instagram →</a>
       </div>
 
-      <!--
-        LIVE AUTO-UPDATING FEED
-        The grid below is a hand-picked preview. To make this section refresh
-        automatically every time you post to Instagram, connect a free feed
-        widget (Behold.so recommended) and replace this whole <div class="mg-iggrid">…</div>
-        with the widget's embed code. Full step-by-step is in README.md → "Instagram feed".
-      -->
-      <div class="mg-iggrid">
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener"><img src="images/originals/instagram-feed/image-asset-00MRLF.jpeg" alt="Timber-frame set structures on location" loading="lazy"></a>
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener"><img src="images/originals/instagram-feed/image-asset-1AV18V.jpeg" alt="Bud vases in wood frames" loading="lazy"></a>
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener"><img src="images/originals/instagram-feed/image-asset-1SV1IZ.jpeg" alt="Upholstered bench detail" loading="lazy"></a>
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener"><img src="images/originals/instagram-feed/image-asset-63UFY1.jpeg" alt="Home library with built-in shelves" loading="lazy"></a>
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener"><img src="images/originals/instagram-feed/image-asset-AU1Q7E.jpeg" alt="Hand-made wooden toy cars in the shop" loading="lazy"></a>
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener"><img src="images/originals/instagram-feed/image-asset-C4D2RL.jpeg" alt="Hand-planing a board" loading="lazy"></a>
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener"><img src="images/originals/instagram-feed/image-asset-Z2NMVB.jpeg" alt="Building a set on location" loading="lazy"></a>
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener"><img src="images/originals/instagram-feed/image-asset.jpeg" alt="Shaping a piece on the machine" loading="lazy"></a>
-      </div>
+      <!-- Live Instagram feed via Behold (behold.so) — auto-updates as new posts go up. -->
+      <behold-widget feed-id="XoXLpXGcmHFl1GwgqtGf"></behold-widget>
     </div>
   </section>
 
@@ -259,6 +244,15 @@
       <span>Designer &amp; maker of fine furniture · West Orange, NJ · © 2026</span>
     </div>
   </footer>
+
+  <!-- Behold Instagram widget loader -->
+  <script>
+    (() => {
+      if(window.__bhldScript)return;window.__bhldScript=true;
+      const d=document,s=d.createElement("script");s.type="module";
+      s.src="https://w.behold.so/widget.js";setTimeout(()=>{d.head.append(s);},0);
+    })();
+  </script>
 
 </body>
 </html>
