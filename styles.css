@@ -1,0 +1,151 @@
+/* Max Grossman Designs — tokens from the "Organic" design system,
+   retuned to the greige / dark-brown / sage palette. */
+@import url('https://fonts.googleapis.com/css2?family=Caprasimo:wght@400&family=Figtree:wght@400;600;700&display=swap');
+
+:root {
+  --color-bg: #e2ddd3;
+  --color-surface: #d3cec2;
+  --color-text: #33261a;
+  --color-divider: color-mix(in srgb, #33261a 15%, transparent);
+
+  --color-accent: #6a5030;
+  --color-accent-100: #efe8dc;
+  --color-accent-200: #e2d6c4;
+  --color-accent-300: #cbb99b;
+  --color-accent-400: #a98f6a;
+  --color-accent-500: #7d6242;
+  --color-accent-600: #5c4429;
+  --color-accent-700: #46331e;
+  --color-accent-800: #322414;
+  --color-accent-900: #22180d;
+
+  --color-accent-2-100: #e4e6d5;
+  --color-accent-2-200: #d0d5b9;
+  --color-accent-2-300: #b2bb93;
+  --color-accent-2-400: #8d9968;
+  --color-accent-2-500: #6f7d4a;
+  --color-accent-2-600: #566237;
+  --color-accent-2-700: #414c29;
+  --color-accent-2-800: #2f3820;
+  --color-accent-2-900: #202616;
+
+  --font-heading: "Caprasimo", system-ui, sans-serif;
+  --font-heading-weight: 400;
+  --font-body: "Figtree", system-ui, sans-serif;
+
+  --space-1: 4.4px;
+  --space-2: 8.8px;
+  --space-3: 13.2px;
+  --space-4: 17.6px;
+  --space-6: 26.4px;
+  --space-8: 35.2px;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 28px;
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #22180d 16%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #22180d 18%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #22180d 24%, transparent);
+}
+
+/* — base — */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--color-bg); color: var(--color-text);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  text-wrap: pretty;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 var(--space-2);
+}
+p { margin: 0 0 var(--space-3); }
+a { color: var(--color-accent); text-underline-offset: 3px; }
+img { display: block; max-width: 100%; }
+figure { margin: 0; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+
+.washed { filter: saturate(0.6) contrast(0.85) brightness(1.1) opacity(0.94); }
+
+/* — buttons — */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; text-decoration: none;
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 14px; line-height: 1.2; color: var(--color-text);
+  background: transparent; border: 1px solid transparent;
+  padding: var(--space-2) calc(var(--space-3) * 1.2);
+  border-radius: 999px;
+}
+.btn svg { display: block; }
+.btn-primary { background: var(--color-accent); color: var(--color-bg); }
+.btn-primary:hover { background: var(--color-accent-600); }
+.btn-primary:active { background: var(--color-accent-700); }
+.btn-secondary { border-color: var(--color-divider); }
+.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
+.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+.btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
+.btn-icon { width: 36px; height: 36px; padding: 0; }
+
+/* — tags — */
+.tag {
+  display: inline-flex; align-items: center; font-size: 11px;
+  letter-spacing: 0.02em; padding: 3px 10px; border-radius: 999px;
+}
+.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+
+/* — layout — */
+.mg-wrap { max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 56px); }
+.mg-nav {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-divider);
+}
+.mg-navrow { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+.mg-navlinks { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 600; }
+.mg-navlinks a { color: var(--color-text); text-decoration: none; }
+.mg-navlinks a:hover { color: var(--color-accent-700); }
+.mg-hero {
+  display: grid; grid-template-columns: 1.05fr .95fr;
+  gap: clamp(28px, 5vw, 64px); align-items: center;
+  padding: clamp(48px, 7vw, 88px) 0;
+}
+.mg-workgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.mg-about {
+  display: grid; grid-template-columns: .8fr 1.2fr;
+  gap: clamp(28px, 5vw, 64px); align-items: center;
+}
+.mg-shoprow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.mg-card figure { transition: transform .25s ease; }
+.mg-card:hover figure { transform: translateY(-4px); }
+.mg-card:hover h3 { color: var(--color-accent-700); }
+
+/* — image slots: replace each .img-slot div with a real <img> when photos are ready — */
+.img-slot {
+  width: 100%; height: 100%; display: grid; place-items: center;
+  padding: var(--space-4); text-align: center;
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 14px, color-mix(in srgb, var(--color-text) 4%, transparent) 14px 28px),
+    var(--color-surface);
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  font-size: 13px; line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .mg-hero { grid-template-columns: 1fr; }
+  .mg-hero figure { order: -1; }
+  .mg-workgrid { grid-template-columns: repeat(2, 1fr); }
+  .mg-about { grid-template-columns: 1fr; }
+  .mg-about figure { max-width: 320px; }
+}
+@media (max-width: 620px) {
+  .mg-navlinks a:not(.mg-cta) { display: none; }
+  .mg-workgrid { grid-template-columns: 1fr; }
+  .mg-shoprow { grid-template-columns: 1fr; }
+}
