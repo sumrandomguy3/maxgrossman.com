@@ -48,6 +48,25 @@ a photo of you, so it shows a striped box. To add one:
 Plenty more of your photos are archived in `images/originals/` if you'd rather
 use one of those.
 
+## Instagram feed
+
+The "Fresh from the workshop" section on the homepage currently shows a
+hand-picked grid of your past posts. To make it **update automatically every
+time you post to Instagram**, connect a free feed widget — Instagram itself
+requires a one-time login to authorize any live feed, so this is a five-minute
+setup you do once:
+
+1. Go to [behold.so](https://behold.so) and create a free account (the free tier
+   shows a live feed that refreshes on its own).
+2. Connect your `@mcgrossman` Instagram account and create a feed. Behold gives
+   you two lines: a `<script …>` tag and a `<behold-widget feed-id="…">` tag.
+3. In `index.html`, find the `<!-- INSTAGRAM -->` section and replace the whole
+   `<div class="mg-iggrid"> … </div>` block with the `<behold-widget …>` line,
+   and paste the `<script …>` line just before `</body>` at the bottom of the file.
+
+That's it — from then on the section mirrors your Instagram automatically.
+(LightWidget and SnapWidget work the same way if you prefer one of those.)
+
 ## Publishing (free hosting)
 
 Any of these work; GitHub Pages is simplest since the code already lives here:
