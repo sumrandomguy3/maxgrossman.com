@@ -1,12 +1,13 @@
 /* Max Grossman Designs — tokens from the "Organic" design system,
    retuned to the greige / dark-brown / sage palette. */
-@import url('https://fonts.googleapis.com/css2?family=Caprasimo:wght@400&family=Figtree:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --color-bg: #e2ddd3;
-  --color-surface: #d3cec2;
-  --color-text: #33261a;
-  --color-divider: color-mix(in srgb, #33261a 15%, transparent);
+  --color-bg: #dcdcda;
+  --color-surface: #ccccc9;
+  --color-text: #322a20;
+  --color-on-accent: #f6f4ef;
+  --color-divider: color-mix(in srgb, #322a20 15%, transparent);
 
   --color-accent: #6a5030;
   --color-accent-100: #efe8dc;
@@ -19,7 +20,7 @@
   --color-accent-800: #322414;
   --color-accent-900: #22180d;
 
-  --color-accent-2-100: #e4e6d5;
+  --color-accent-2-100: #dde0d6;
   --color-accent-2-200: #d0d5b9;
   --color-accent-2-300: #b2bb93;
   --color-accent-2-400: #8d9968;
@@ -29,9 +30,9 @@
   --color-accent-2-800: #2f3820;
   --color-accent-2-900: #202616;
 
-  --font-heading: "Caprasimo", system-ui, sans-serif;
-  --font-heading-weight: 400;
-  --font-body: "Figtree", system-ui, sans-serif;
+  --font-heading: "Archivo", system-ui, sans-serif;
+  --font-heading-weight: 700;
+  --font-body: "Archivo", system-ui, sans-serif;
 
   --space-1: 4.4px;
   --space-2: 8.8px;
@@ -82,7 +83,7 @@ figure { margin: 0; }
   border-radius: 999px;
 }
 .btn svg { display: block; }
-.btn-primary { background: var(--color-accent); color: var(--color-bg); }
+.btn-primary { background: var(--color-accent); color: var(--color-on-accent); }
 .btn-primary:hover { background: var(--color-accent-600); }
 .btn-primary:active { background: var(--color-accent-700); }
 .btn-secondary { border-color: var(--color-divider); }
@@ -107,7 +108,9 @@ figure { margin: 0; }
   background: color-mix(in srgb, var(--color-bg) 88%, transparent);
   backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-divider);
 }
-.mg-navrow { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+.mg-navrow { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+.mg-logo { height: 34px; width: auto; display: block; }
+@media (max-width: 620px) { .mg-logo { height: 28px; } }
 .mg-navlinks { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 600; }
 .mg-navlinks a { color: var(--color-text); text-decoration: none; }
 .mg-navlinks a:hover { color: var(--color-accent-700); }
@@ -145,10 +148,10 @@ figure { margin: 0; }
 .mg-piece-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 6px; }
 .mg-piece-head h2 { font-size: clamp(24px, 3vw, 32px); margin: 0; }
 .mg-piece p { font-size: 16px; line-height: 1.65; max-width: 60ch; margin: 0 0 22px; color: color-mix(in srgb, var(--color-text) 78%, transparent); }
-.mg-feature { margin: 0 0 18px; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 3/2; box-shadow: var(--shadow-md); }
-.mg-feature img, .mg-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mg-feature { margin: 0 0 18px; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 3/2; box-shadow: var(--shadow-md); background: #fff; }
+.mg-feature img, .mg-gallery img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .mg-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-.mg-gallery figure { margin: 0; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 4/3; box-shadow: var(--shadow-sm); background: var(--color-surface); transition: transform .25s ease; }
+.mg-gallery figure { margin: 0; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 4/3; box-shadow: var(--shadow-sm); background: #fff; transition: transform .25s ease; }
 .mg-gallery figure:hover { transform: translateY(-4px); }
 
 @media (max-width: 900px) {
