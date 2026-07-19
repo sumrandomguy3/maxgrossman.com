@@ -90,6 +90,19 @@ run the build script (or ask Claude) — it stamps your change into every page.
 Please don't edit the nav directly inside a page; the next build run would
 overwrite it.
 
+## The contact form
+
+The "Get in touch" buttons all lead to `contact.html`. Submissions are
+delivered by [FormSubmit](https://formsubmit.co) (free, no account) straight to
+**maxgrossman@outlook.com** — the address appears twice in `contact.html` (once
+in the form's `action`, once in the script below it), so change both if your
+email ever changes.
+
+The very first submission won't arrive as a message: FormSubmit instead emails
+you a one-time **"activate this form"** confirmation. Click it once and every
+submission after that lands in your inbox. Worth doing yourself right after the
+site goes live — submit the form once as a test and click the confirmation.
+
 ## Shop changes
 
 - **Change a price:** edit the product's page (`shop-<name>.html`) — update the

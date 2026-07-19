@@ -67,7 +67,7 @@ with photos, price, description, and size/color/wood selectors where relevant.
 
 - Right now `PAYPAL_MERCHANT` in `shop.js` is empty, so every "Add to cart"
   button falls back to opening a **pre-filled order email** to
-  `max@maxgrossman.com` (with the item, size/color, and price). The shop is
+  `maxgrossman@outlook.com` (with the item, size/color, and price). The shop is
   usable today with zero setup.
 - To turn on real PayPal checkout, put your PayPal account email in that one line:
 

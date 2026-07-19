@@ -8,10 +8,10 @@
  *   const PAYPAL_MERCHANT = "you@example.com";
  *
  * Until this is filled in, the buttons fall back to opening a pre-filled order
- * email to max@maxgrossman.com, so the shop still works today.
+ * email to maxgrossman@outlook.com, so the shop still works today.
  */
 const PAYPAL_MERCHANT = "maxgrossman@outlook.com"; // ← your PayPal email; enables PayPal checkout
-const ORDER_EMAIL = "max@maxgrossman.com";
+const ORDER_EMAIL = "maxgrossman@outlook.com";
 
 document.querySelectorAll("form.pp-form").forEach((form) => {
   if (PAYPAL_MERCHANT) {
