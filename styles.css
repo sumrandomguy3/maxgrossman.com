@@ -101,6 +101,19 @@ figure { margin: 0; }
 }
 .tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
 
+/* — shared page chrome (nav/footer markup lives in partials/, synced by tools/build.py) — */
+.mg-kicker {
+  display: block; font-size: 13px; letter-spacing: .09em; text-transform: uppercase;
+  font-weight: 600; color: var(--color-accent-700); margin-bottom: 12px;
+}
+.mg-footer { border-top: 1px solid var(--color-divider); }
+.mg-footrow {
+  padding: 28px 0; display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; font-size: 13px;
+  color: color-mix(in srgb, var(--color-text) 62%, transparent);
+}
+.mg-footname { font-family: var(--font-heading); font-size: 16px; color: var(--color-text); }
+
 /* — layout — */
 .mg-wrap { max-width: none; margin: 0; padding: 0 clamp(20px, 4vw, 72px); }
 .mg-nav {
@@ -138,9 +151,26 @@ figure { margin: 0; }
   border-radius: var(--radius-lg);
 }
 .mg-restore figure { aspect-ratio: 3/2; }
+.mg-card { display: block; text-decoration: none; color: inherit; }
 .mg-card figure { transition: transform .25s ease; }
 .mg-card:hover figure { transform: translateY(-4px); }
 .mg-card:hover h3 { color: var(--color-accent-700); }
+.mg-cardfig {
+  margin: 0 0 16px; border-radius: var(--radius-md); overflow: hidden;
+  aspect-ratio: 4/3; box-shadow: var(--shadow-sm); background: #fff;
+}
+.mg-cardfig img { width: 100%; height: 100%; object-fit: contain; }
+.mg-cardrow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.mg-cardrow h3 { font-size: 23px; margin: 0; transition: color .2s ease; }
+.mg-carddesc {
+  margin: 7px 0 0; font-size: 14.5px; line-height: 1.55;
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
+}
+.mg-shopcard { background: var(--color-surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+.mg-shopcard figure { overflow: hidden; background: #fff; }
+.mg-shopcard img { width: 100%; aspect-ratio: 1; object-fit: contain; display: block; }
+.mg-shopcard-row { padding: 15px 18px; display: flex; align-items: baseline; justify-content: space-between; }
+.mg-shopcard-row h3 { font-size: 19px; margin: 0; transition: color .2s ease; }
 
 /* — image slots: replace each .img-slot div with a real <img> when photos are ready — */
 .img-slot {
@@ -190,6 +220,9 @@ figure { margin: 0; }
 
 /* — product page — */
 .mg-product { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(28px, 5vw, 56px); align-items: start; padding: clamp(20px, 3vw, 36px) 0 clamp(40px, 6vw, 64px); }
+.mg-product h1 { font-size: clamp(30px, 4vw, 44px); line-height: 1.05; margin: 0; }
+.mg-desc { font-size: 16px; line-height: 1.65; margin: 0 0 4px; color: color-mix(in srgb, var(--color-text) 82%, transparent); }
+.mg-wrap > .mg-backlink { margin-top: 22px; }
 .mg-product-feature { margin: 0 0 14px; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 1; background: #fff; box-shadow: var(--shadow-md); }
 .mg-product-feature img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .mg-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
@@ -205,6 +238,8 @@ figure { margin: 0; }
 
 /* — portfolio (category) pages — */
 .mg-pagehero { padding: clamp(36px, 6vw, 72px) 0 clamp(20px, 3vw, 36px); max-width: 62ch; }
+.mg-pagehero h1 { font-size: clamp(38px, 5vw, 58px); line-height: 1.04; margin: 0 0 18px; letter-spacing: -.02em; }
+.mg-pagehero > p { font-size: 17px; line-height: 1.65; margin: 0; color: color-mix(in srgb, var(--color-text) 80%, transparent); }
 .mg-backlink { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--color-accent-700); text-decoration: none; margin-bottom: 22px; }
 .mg-backlink:hover { color: var(--color-accent-900); }
 .mg-piece { padding: clamp(24px, 4vw, 44px) 0; border-top: 1px solid var(--color-divider); }
@@ -228,6 +263,7 @@ figure { margin: 0; }
 @media (max-width: 620px) {
   .mg-navlinks { gap: 12px; font-size: 14px; }
   .mg-navlinks .mg-cta { padding: 7px 13px; white-space: nowrap; }
+  .mg-navlinks .mg-nav-wide { display: none; }
   .mg-workgrid { grid-template-columns: 1fr; }
   .mg-shoprow { grid-template-columns: 1fr; }
   .mg-gallery { grid-template-columns: repeat(2, 1fr); gap: 12px; }

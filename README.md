@@ -2,18 +2,27 @@
 
 The website for Max Grossman Designs — furniture designer & maker, West Orange, NJ.
 
-This is a plain static site: one HTML file, one stylesheet, no build step and no
-frameworks. It can be hosted for free, so the only recurring cost is the domain
+This is a plain static site: plain HTML pages, one stylesheet, no frameworks —
+plus one tiny optional script (`tools/build.py`) that keeps the shared nav/footer
+in sync and shrinks photos for the web. It can be hosted for free, so the only recurring cost is the domain
 registration itself (roughly $10–15/year instead of ~$200/year on Squarespace).
 
 ## Files
 
+**New to editing the site? Start with [`HOW-TO-EDIT.md`](HOW-TO-EDIT.md) — the
+plain-English guide to changing text, photos and prices.**
+
 | File | What it is |
 |---|---|
-| `index.html` | The whole homepage — nav, hero, work portfolio, about, shop, contact |
+| `index.html` | The whole homepage — nav, hero, work portfolio, restoration, about, shop, contact |
+| `restoration.html`, `seating.html`, … | The restoration page and the portfolio pages |
+| `shop.html`, `shop-*.html`, `shop.js` | The store index, one page per product, and the PayPal checkout wiring |
 | `styles.css` | Design tokens (colors, fonts, spacing) and all component styles |
+| `partials/` | The one shared copy of the nav bar and footer (synced into pages by `tools/build.py`) |
+| `tools/build.py` | The only "build step": syncs partials into pages and makes web-sized photo copies |
 | `images/` | Curated photos used by the homepage, plus `logo.png` |
 | `images/originals/` | Full archive of all 248 photos from the old Squarespace site, organized by page |
+| `images/web/` | Auto-generated fast-loading copies of the originals — the pages serve these |
 | `MIGRATION.md` | Every page's text, all shop prices/descriptions, and which photos belong to which page |
 | `content.json` / `imgmap.json` | Machine-readable versions of the migrated text and page→photo map |
 

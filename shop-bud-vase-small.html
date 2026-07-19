@@ -7,37 +7,40 @@
 <meta name="description" content="This bud vase is made for propagation of your favorite flowers. It's designed to fit perfectly on your window sill while letting you see the roots grow fro">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
 <link rel="apple-touch-icon" href="images/favicon-180.png">
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
-<body style="font-family:var(--font-body);color:var(--color-text)">
+<body>
 
+  <!-- nav:start (shared nav — edit partials/nav.html, then run: python3 tools/build.py) -->
   <nav class="mg-nav">
-    <div class="mg-wrap mg-navrow">
-      <a href="index.html" class="mg-brand" aria-label="Max Grossman Designs" style="display:inline-flex;align-items:center;gap:14px;text-decoration:none"><img src="images/logo-table.png" alt="" class="mg-logo"><span class="mg-brand-text">Max Grossman Designs</span></a>
-      <div class="mg-navlinks">
-        <a href="index.html#work">Work</a>
-        <a href="shop.html">Shop</a>
-        <a href="index.html#about">About</a>
-        <a href="index.html#contact" class="btn btn-primary mg-cta" style="text-decoration:none">Get in touch</a>
-      </div>
+  <div class="mg-wrap mg-navrow">
+    <a href="index.html" class="mg-brand" aria-label="Max Grossman Designs"><img src="images/logo-table.png" alt="" class="mg-logo"><span class="mg-brand-text">Max Grossman Designs</span></a>
+    <div class="mg-navlinks">
+      <a href="index.html#work">Work</a>
+      <a href="restoration.html" class="mg-nav-wide">Restoration</a>
+      <a href="shop.html">Shop</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact" class="btn btn-primary mg-cta">Get in touch</a>
     </div>
-  </nav>
+  </div>
+</nav>
+  <!-- nav:end -->
 
   <div class="mg-wrap">
-    <a href="shop.html" class="mg-backlink" style="margin-top:22px">← Back to shop</a>
+    <a href="shop.html" class="mg-backlink">← Back to shop</a>
     <div class="mg-product">
       <div>
-        <figure class="mg-product-feature"><img src="images/originals/shop-bud-vase-small/processed_21cd57120b4740ea878cf3bf27cf5b97.jpeg" alt="Bud Vase (Small)"></figure>
+        <figure class="mg-product-feature"><img src="images/web/shop-bud-vase-small/processed_21cd57120b4740ea878cf3bf27cf5b97.jpeg" alt="Bud Vase (Small)"></figure>
       <div class="mg-thumbs">
-        <figure><img src="images/originals/shop-bud-vase-small/processed_314c757c96f74569bf7e47718804f84d.jpeg" alt="Bud Vase (Small)" loading="lazy"></figure>
-        <figure><img src="images/originals/shop-bud-vase-small/processed_7ab1f634a2814a0e99bddb9b67732374.jpeg" alt="Bud Vase (Small)" loading="lazy"></figure>
+        <figure><img src="images/web/shop-bud-vase-small/processed_314c757c96f74569bf7e47718804f84d.jpeg" alt="Bud Vase (Small)" loading="lazy"></figure>
+        <figure><img src="images/web/shop-bud-vase-small/processed_7ab1f634a2814a0e99bddb9b67732374.jpeg" alt="Bud Vase (Small)" loading="lazy"></figure>
       </div>
       </div>
       <div>
-        <span style="display:block;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--color-accent-700);margin-bottom:10px">Max Grossman Designs</span>
-        <h1 style="font-size:clamp(30px,4vw,44px);line-height:1.05;margin:0">Bud Vase (Small)</h1>
+        <span class="mg-kicker">Max Grossman Designs</span>
+        <h1>Bud Vase (Small)</h1>
       <div class="mg-buybox">
-        <p style="font-size:16px;line-height:1.65;margin:0 0 4px;color:color-mix(in srgb,var(--color-text) 82%,transparent)">This bud vase is made for propagation of your favorite flowers. It's designed to fit perfectly on your window sill while letting you see the roots grow from your plant cutting. The narrow opening of the test tube limits evaporation and is easily removable for periodic cleaning. The wood is locally sourced hardwood finished with non toxic mineral oil and bees wax.</p>
+        <p class="mg-desc">This bud vase is made for propagation of your favorite flowers. It's designed to fit perfectly on your window sill while letting you see the roots grow from your plant cutting. The narrow opening of the test tube limits evaporation and is easily removable for periodic cleaning. The wood is locally sourced hardwood finished with non toxic mineral oil and bees wax.</p>
         <div class="mg-price-lg">$25.00</div>
         <form class="pp-form" data-item="Bud Vase (Small)" data-price="25.00" target="_blank" action="https://www.paypal.com/cgi-bin/webscr" method="post">
           <input type="hidden" name="cmd" value="_cart">
@@ -55,12 +58,14 @@
     </div>
   </div>
 
-  <footer style="border-top:1px solid var(--color-divider)">
-    <div class="mg-wrap" style="padding:28px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">
-      <span style="font-family:var(--font-heading);font-size:16px;color:var(--color-text)">Max Grossman</span>
-      <span>Designer &amp; maker of fine furniture · West Orange, NJ · © 2026</span>
-    </div>
-  </footer>
+  <!-- footer:start (shared footer — edit partials/footer.html, then run: python3 tools/build.py) -->
+  <footer class="mg-footer">
+  <div class="mg-wrap mg-footrow">
+    <span class="mg-footname">Max Grossman</span>
+    <span>Designer &amp; maker of fine furniture · West Orange, NJ · © 2026</span>
+  </div>
+</footer>
+  <!-- footer:end -->
   <script src="shop.js"></script>
 </body>
 </html>

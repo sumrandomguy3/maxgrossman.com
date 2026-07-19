@@ -7,7 +7,7 @@
 <meta name="description" content="Max Grossman is a furniture designer and maker working in wood and metal in West Orange, NJ since 2015. Custom seating, tables, casework and metalwork — plus furniture restoration, refinishing and reupholstery for Essex County.">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
 <link rel="apple-touch-icon" href="images/favicon-180.png">
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -28,32 +28,35 @@
 }
 </script>
 </head>
-<body style="font-family:var(--font-body);color:var(--color-text)">
+<body>
 
   <!-- NAV -->
+  <!-- nav:start (shared nav — edit partials/nav.html, then run: python3 tools/build.py) -->
   <nav class="mg-nav">
-    <div class="mg-wrap mg-navrow">
-      <a href="#top" class="mg-brand" aria-label="Max Grossman Designs" style="display:inline-flex;align-items:center;gap:14px;text-decoration:none"><img src="images/logo-table.png" alt="" class="mg-logo"><span class="mg-brand-text">Max Grossman Designs</span></a>
-      <div class="mg-navlinks">
-        <a href="#work">Work</a>
-        <a href="shop.html">Shop</a>
-        <a href="#about">About</a>
-        <a href="#contact" class="btn btn-primary mg-cta" style="text-decoration:none">Get in touch</a>
-      </div>
+  <div class="mg-wrap mg-navrow">
+    <a href="index.html" class="mg-brand" aria-label="Max Grossman Designs"><img src="images/logo-table.png" alt="" class="mg-logo"><span class="mg-brand-text">Max Grossman Designs</span></a>
+    <div class="mg-navlinks">
+      <a href="index.html#work">Work</a>
+      <a href="restoration.html" class="mg-nav-wide">Restoration</a>
+      <a href="shop.html">Shop</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact" class="btn btn-primary mg-cta">Get in touch</a>
     </div>
-  </nav>
+  </div>
+</nav>
+  <!-- nav:end -->
 
   <div id="top" class="mg-wrap">
 
     <!-- HERO -->
     <header class="mg-hero">
       <div>
-        <span style="display:block;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--color-accent-700);margin-bottom:22px">Furniture designer &amp; maker · West Orange, NJ</span>
+        <span class="mg-kicker">Furniture designer &amp; maker · West Orange, NJ</span>
         <h1 style="font-size:clamp(44px,6vw,68px);line-height:1.03;margin:0 0 24px;letter-spacing:-.02em">Fine furniture,<br>built to be<br>handed down.</h1>
         <p style="font-size:17px;line-height:1.65;max-width:46ch;margin:0 0 30px;color:color-mix(in srgb,var(--color-text) 80%,transparent)">Building in wood and metal since 2015 — chairs you'll argue over in the will, tables meant for forty Thanksgivings. I also restore and repair well-loved furniture, so the pieces you already treasure keep earning their keep. Take a look around, then tell me what you'd like built — or brought back.</p>
         <div style="display:flex;gap:14px;flex-wrap:wrap">
-          <a href="#work" class="btn btn-primary" style="text-decoration:none">See the work</a>
-          <a href="#contact" class="btn btn-ghost" style="text-decoration:none">Start a project</a>
+          <a href="#work" class="btn btn-primary">See the work</a>
+          <a href="#contact" class="btn btn-ghost">Start a project</a>
         </div>
       </div>
       <figure class="washed" style="border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:4/5;box-shadow:var(--shadow-lg);background:#fff">
@@ -65,77 +68,77 @@
     <section id="work" style="padding:clamp(24px,4vw,48px) 0 clamp(48px,7vw,80px)">
       <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:36px">
         <div>
-          <span style="display:block;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--color-accent-700);margin-bottom:10px">The work</span>
+          <span class="mg-kicker">The work</span>
           <h2 style="font-size:clamp(30px,4vw,40px);margin:0">Some of what I've made</h2>
         </div>
         <span style="font-size:15px;color:color-mix(in srgb,var(--color-text) 65%,transparent);white-space:nowrap">Wood &amp; steel, one shop</span>
       </div>
       <div class="mg-workgrid">
 
-        <a href="seating.html" class="mg-card" style="text-decoration:none;color:inherit;display:block">
-          <figure class="washed" style="margin:0 0 16px;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow-sm);background:#fff">
-            <img src="images/work-seating.jpg" alt="Ash and steel bar stool and chair from the M-Series" style="width:100%;height:100%;object-fit:contain" loading="lazy">
+        <a href="seating.html" class="mg-card">
+          <figure class="washed mg-cardfig">
+            <img src="images/work-seating.jpg" alt="Ash and steel bar stool and chair from the M-Series" loading="lazy">
           </figure>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
-            <h3 style="font-size:23px;margin:0;transition:color .2s ease">Seating</h3>
+          <div class="mg-cardrow">
+            <h3>Seating</h3>
             <span class="tag tag-outline">4 lines</span>
           </div>
-          <p style="margin:7px 0 0;font-size:14.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 72%,transparent)">The M-Series, Pants Chair, Benches &amp; the K Chair.</p>
+          <p class="mg-carddesc">The M-Series, Pants Chair, Benches &amp; the K Chair.</p>
         </a>
 
-        <a href="tables.html" class="mg-card" style="text-decoration:none;color:inherit;display:block">
-          <figure class="washed" style="margin:0 0 16px;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow-sm);background:#fff">
-            <img src="images/work-tables.jpg" alt="The 6yt sofa table in white oak, steel and walnut" style="width:100%;height:100%;object-fit:contain" loading="lazy">
+        <a href="tables.html" class="mg-card">
+          <figure class="washed mg-cardfig">
+            <img src="images/work-tables.jpg" alt="The 6yt sofa table in white oak, steel and walnut" loading="lazy">
           </figure>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
-            <h3 style="font-size:23px;margin:0;transition:color .2s ease">Tables</h3>
+          <div class="mg-cardrow">
+            <h3>Tables</h3>
             <span class="tag tag-outline">3 kinds</span>
           </div>
-          <p style="margin:7px 0 0;font-size:14.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 72%,transparent)">Dining, office, night stands &amp; the 6yt.</p>
+          <p class="mg-carddesc">Dining, office, night stands &amp; the 6yt.</p>
         </a>
 
-        <a href="casework.html" class="mg-card" style="text-decoration:none;color:inherit;display:block">
-          <figure class="washed" style="margin:0 0 16px;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow-sm);background:#fff">
-            <img src="images/work-casework.jpg" alt="An angular walnut reliquary with brass hinges" style="width:100%;height:100%;object-fit:contain" loading="lazy">
+        <a href="casework.html" class="mg-card">
+          <figure class="washed mg-cardfig">
+            <img src="images/work-casework.jpg" alt="An angular walnut reliquary with brass hinges" loading="lazy">
           </figure>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
-            <h3 style="font-size:23px;margin:0;transition:color .2s ease">Case Work</h3>
+          <div class="mg-cardrow">
+            <h3>Case Work</h3>
             <span class="tag tag-outline">Built-ins</span>
           </div>
-          <p style="margin:7px 0 0;font-size:14.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 72%,transparent)">Cabinets and casework that hide the mess.</p>
+          <p class="mg-carddesc">Cabinets and casework that hide the mess.</p>
         </a>
 
-        <a href="library-steps.html" class="mg-card" style="text-decoration:none;color:inherit;display:block">
-          <figure class="washed" style="margin:0 0 16px;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow-sm);background:#fff">
-            <img src="images/work-library-steps.jpg" alt="A tall, curved white oak library step stool" style="width:100%;height:100%;object-fit:contain" loading="lazy">
+        <a href="library-steps.html" class="mg-card">
+          <figure class="washed mg-cardfig">
+            <img src="images/work-library-steps.jpg" alt="A tall, curved white oak library step stool" loading="lazy">
           </figure>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
-            <h3 style="font-size:23px;margin:0;transition:color .2s ease">Library Steps</h3>
+          <div class="mg-cardrow">
+            <h3>Library Steps</h3>
             <span class="tag tag-outline">Reach</span>
           </div>
-          <p style="margin:7px 0 0;font-size:14.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 72%,transparent)">For the top shelf, with your dignity intact.</p>
+          <p class="mg-carddesc">For the top shelf, with your dignity intact.</p>
         </a>
 
-        <a href="metalwork.html" class="mg-card" style="text-decoration:none;color:inherit;display:block">
-          <figure class="washed" style="margin:0 0 16px;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow-sm);background:#fff">
-            <img src="images/work-metalwork.jpg" alt="A forged steel rose made in the workshop" style="width:100%;height:100%;object-fit:contain" loading="lazy">
+        <a href="metalwork.html" class="mg-card">
+          <figure class="washed mg-cardfig">
+            <img src="images/work-metalwork.jpg" alt="A forged steel rose made in the workshop" loading="lazy">
           </figure>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
-            <h3 style="font-size:23px;margin:0;transition:color .2s ease">Metal Work</h3>
+          <div class="mg-cardrow">
+            <h3>Metal Work</h3>
             <span class="tag tag-outline">Wood + steel</span>
           </div>
-          <p style="margin:7px 0 0;font-size:14.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 72%,transparent)">Including steel roses that never need watering.</p>
+          <p class="mg-carddesc">Including steel roses that never need watering.</p>
         </a>
 
-        <a href="theater-sets.html" class="mg-card" style="text-decoration:none;color:inherit;display:block">
-          <figure class="washed" style="margin:0 0 16px;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow-sm);background:#fff">
-            <img src="images/work-theater.jpg" alt="A full stage set built for a theater production" style="width:100%;height:100%;object-fit:contain" loading="lazy">
+        <a href="theater-sets.html" class="mg-card">
+          <figure class="washed mg-cardfig">
+            <img src="images/work-theater.jpg" alt="A full stage set built for a theater production" loading="lazy">
           </figure>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
-            <h3 style="font-size:23px;margin:0;transition:color .2s ease">Theater Sets</h3>
+          <div class="mg-cardrow">
+            <h3>Theater Sets</h3>
             <span class="tag tag-outline">On stage</span>
           </div>
-          <p style="margin:7px 0 0;font-size:14.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 72%,transparent)">Sets built fast and struck even faster.</p>
+          <p class="mg-carddesc">Sets built fast and struck even faster.</p>
         </a>
 
       </div>
@@ -147,12 +150,12 @@
         <img src="images/restoration.jpg" alt="A refinished dining table with a freshly restored book-matched top" style="width:100%;height:100%;object-fit:cover" loading="lazy">
       </figure>
       <div>
-        <span style="display:block;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--color-accent-700);margin-bottom:12px">Restoration &amp; repair</span>
+        <span class="mg-kicker">Restoration &amp; repair</span>
         <h2 style="font-size:clamp(26px,3.4vw,36px);margin:0 0 14px;line-height:1.1">Already own the perfect piece? Let's bring it back.</h2>
         <p style="font-size:16px;line-height:1.7;max-width:52ch;margin:0 0 22px;color:color-mix(in srgb,var(--color-text) 78%,transparent)">I restore furniture to the way it was the day you bought it — refinishing, reupholstery and structural repair for all interior furniture, right here in Essex County. Send me a photo of the patient and I'll tell you what's possible.</p>
         <div style="display:flex;gap:14px;flex-wrap:wrap">
-          <a href="mailto:max@maxgrossman.com?subject=Furniture%20restoration" class="btn btn-primary" style="text-decoration:none">Ask about a repair</a>
-          <a href="restoration.html" class="btn btn-ghost" style="text-decoration:none">See restoration work</a>
+          <a href="mailto:max@maxgrossman.com?subject=Furniture%20restoration" class="btn btn-primary">Ask about a repair</a>
+          <a href="restoration.html" class="btn btn-ghost">See restoration work</a>
         </div>
       </div>
     </section>
@@ -165,12 +168,12 @@
         <img src="images/portrait.jpg" alt="Max Grossman in his workshop, arms crossed" style="width:100%;height:100%;object-fit:cover" loading="lazy">
       </figure>
       <div>
-        <span class="mg-kicker" style="display:block;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;margin-bottom:14px">About</span>
+        <span class="mg-kicker">About</span>
         <h2 style="font-size:clamp(28px,3.6vw,38px);margin:0 0 18px;line-height:1.1">Hi, I'm Max — and yes, I really do make my own sawdust.</h2>
         <p style="font-size:16px;line-height:1.7;max-width:52ch;margin:0 0 16px">I'm a furniture designer/maker and a graduate of the Rochester Institute of Technology's School of American Crafts, working in wood and metal out of West Orange, New Jersey. My work has been shown at the 2014 CIAS Honors Show as well as Gallery R and the Vignelli Center in Rochester, NY. I also teach the next generation as the woodshop teacher at West Orange High School.</p>
         <p style="font-size:16px;line-height:1.7;max-width:52ch;margin:0 0 16px">My work focuses on dynamic pieces that mix wood and metal, drawing on the industrial machinery of modern life — with a healthy dislike for right angles and a soft spot for asymmetry, curves and clever joinery. I like going against the tide of disposable "flat pack" furniture, building pieces that are comfortable, sustainable, and made to be treasured for years.</p>
         <p style="font-size:16px;line-height:1.7;max-width:52ch;margin:0 0 24px">On top of furniture I design and build custom built-ins and details that set a home apart. Always up for a challenge — if you've got a project, I'd love to hear about it.</p>
-        <a href="#contact" class="btn btn-primary" style="text-decoration:none">Get in touch</a>
+        <a href="#contact" class="btn btn-primary">Get in touch</a>
       </div>
     </div>
   </section>
@@ -180,7 +183,7 @@
     <section id="shop" style="padding:clamp(48px,7vw,80px) 0 clamp(24px,4vw,40px)">
       <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:14px">
         <div>
-          <span style="display:block;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--color-accent-700);margin-bottom:10px">Also, a little shop</span>
+          <span class="mg-kicker">Also, a little shop</span>
           <h2 style="font-size:clamp(26px,3.4vw,34px);margin:0">Woodworking puns you can wear</h2>
         </div>
         <a href="shop.html" style="font-size:15px;font-weight:600;color:var(--color-accent-700);white-space:nowrap">Browse the shop →</a>
@@ -188,38 +191,38 @@
       <p style="font-size:16px;line-height:1.65;max-width:60ch;margin:0 0 30px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">Not the main event — just some silly shirts, hand-made toys and suspiciously comfortable spoons I make when the workshop's quiet.</p>
       <div class="mg-shoprow">
 
-        <a href="shop-check-the-logs.html" class="mg-card" style="text-decoration:none;color:inherit">
-          <div style="background:var(--color-surface);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)">
-            <figure style="overflow:hidden;background:#fff">
-              <img src="images/shirt-check-the-logs.jpg" alt="Check The Logs shirt" style="width:100%;aspect-ratio:1;object-fit:contain;display:block" loading="lazy">
+        <a href="shop-check-the-logs.html" class="mg-card">
+          <div class="mg-shopcard">
+            <figure>
+              <img src="images/shirt-check-the-logs.jpg" alt="Check The Logs shirt" loading="lazy">
             </figure>
-            <div style="padding:15px 18px;display:flex;align-items:baseline;justify-content:space-between">
-              <h3 style="font-size:19px;margin:0;transition:color .2s ease">Check The Logs</h3>
-              <span style="font-weight:700;font-size:15px">$24.99</span>
+            <div class="mg-shopcard-row">
+              <h3>Check The Logs</h3>
+              <span class="mg-price">$24.99</span>
             </div>
           </div>
         </a>
 
-        <a href="shop-birch-please.html" class="mg-card" style="text-decoration:none;color:inherit">
-          <div style="background:var(--color-surface);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)">
-            <figure style="overflow:hidden;background:#fff">
-              <img src="images/shirt-birch-please.jpg" alt="Birch Please shirt" style="width:100%;aspect-ratio:1;object-fit:contain;display:block" loading="lazy">
+        <a href="shop-birch-please.html" class="mg-card">
+          <div class="mg-shopcard">
+            <figure>
+              <img src="images/shirt-birch-please.jpg" alt="Birch Please shirt" loading="lazy">
             </figure>
-            <div style="padding:15px 18px;display:flex;align-items:baseline;justify-content:space-between">
-              <h3 style="font-size:19px;margin:0;transition:color .2s ease">Birch Please</h3>
-              <span style="font-weight:700;font-size:15px">$24.99</span>
+            <div class="mg-shopcard-row">
+              <h3>Birch Please</h3>
+              <span class="mg-price">$24.99</span>
             </div>
           </div>
         </a>
 
-        <a href="shop-board-meeting.html" class="mg-card" style="text-decoration:none;color:inherit">
-          <div style="background:var(--color-surface);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)">
-            <figure style="overflow:hidden;background:#fff">
-              <img src="images/shirt-board-meeting.jpg" alt="Board Meeting shirt" style="width:100%;aspect-ratio:1;object-fit:contain;display:block" loading="lazy">
+        <a href="shop-board-meeting.html" class="mg-card">
+          <div class="mg-shopcard">
+            <figure>
+              <img src="images/shirt-board-meeting.jpg" alt="Board Meeting shirt" loading="lazy">
             </figure>
-            <div style="padding:15px 18px;display:flex;align-items:baseline;justify-content:space-between">
-              <h3 style="font-size:19px;margin:0;transition:color .2s ease">Board Meeting</h3>
-              <span style="font-weight:700;font-size:15px">$24.99</span>
+            <div class="mg-shopcard-row">
+              <h3>Board Meeting</h3>
+              <span class="mg-price">$24.99</span>
             </div>
           </div>
         </a>
@@ -233,10 +236,10 @@
     <div class="mg-wrap">
       <div class="mg-ig-head">
         <div>
-          <span style="display:block;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--color-accent-700);margin-bottom:10px">Follow along</span>
+          <span class="mg-kicker">Follow along</span>
           <h2 style="font-size:clamp(26px,3.4vw,36px);margin:0">Fresh from the workshop</h2>
         </div>
-        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener" class="btn btn-secondary" style="text-decoration:none">@mcgrossman on Instagram →</a>
+        <a href="https://instagram.com/mcgrossman" target="_blank" rel="noopener" class="btn btn-secondary">@mcgrossman on Instagram →</a>
       </div>
 
       <!-- Live Instagram feed via Behold (behold.so) — auto-updates as new posts go up. -->
@@ -247,10 +250,10 @@
   <!-- CONTACT -->
   <section id="contact" style="padding:clamp(48px,7vw,88px) 0">
     <div class="mg-wrap" style="text-align:center">
-      <span style="display:block;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--color-accent-700);margin-bottom:16px">Contact</span>
+      <span class="mg-kicker">Contact</span>
       <h2 style="font-size:clamp(32px,4.6vw,52px);margin:0 0 18px;line-height:1.05">Got something rattling<br>around your head?</h2>
       <p style="font-size:17px;line-height:1.65;max-width:52ch;margin:0 auto 28px;color:color-mix(in srgb,var(--color-text) 78%,transparent)">Custom work, furniture restoration and repair, or just a good question — I answer my own mail.</p>
-      <a href="mailto:max@maxgrossman.com" class="btn btn-primary" style="text-decoration:none;font-size:16px">max@maxgrossman.com</a>
+      <a href="mailto:max@maxgrossman.com" class="btn btn-primary" style="font-size:16px">max@maxgrossman.com</a>
       <div style="display:flex;gap:12px;justify-content:center;margin-top:34px">
         <a href="https://instagram.com/mcgrossman" class="btn btn-icon" title="Instagram" style="text-decoration:none">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
@@ -272,12 +275,14 @@
   </section>
 
   <!-- FOOTER -->
-  <footer style="border-top:1px solid var(--color-divider)">
-    <div class="mg-wrap" style="padding:28px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">
-      <span style="font-family:var(--font-heading);font-size:16px;color:var(--color-text)">Max Grossman</span>
-      <span>Designer &amp; maker of fine furniture · West Orange, NJ · © 2026</span>
-    </div>
-  </footer>
+  <!-- footer:start (shared footer — edit partials/footer.html, then run: python3 tools/build.py) -->
+  <footer class="mg-footer">
+  <div class="mg-wrap mg-footrow">
+    <span class="mg-footname">Max Grossman</span>
+    <span>Designer &amp; maker of fine furniture · West Orange, NJ · © 2026</span>
+  </div>
+</footer>
+  <!-- footer:end -->
 
   <!-- Behold Instagram widget loader -->
   <script>
