@@ -112,7 +112,7 @@ figure { margin: 0; }
 .mg-brand { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; }
 .mg-logo { height: 50px; width: auto; display: block; }
 .mg-brand-text { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: clamp(17px, 2vw, 23px); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.05; white-space: nowrap; }
-@media (max-width: 620px) { .mg-logo { height: 40px; } .mg-brand { gap: 10px; } .mg-brand-text { font-size: 15px; white-space: normal; max-width: 8ch; } }
+@media (max-width: 620px) { .mg-logo { height: 40px; } .mg-brand { gap: 10px; } .mg-brand-text { display: none; } }
 .mg-navlinks { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 600; }
 .mg-navlinks a { color: var(--color-text); text-decoration: none; }
 .mg-navlinks a:hover { color: var(--color-accent-700); }
@@ -129,6 +129,15 @@ figure { margin: 0; }
   gap: clamp(28px, 5vw, 64px); align-items: center;
 }
 .mg-shoprow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.mg-restore {
+  display: grid; grid-template-columns: .95fr 1.05fr;
+  gap: clamp(28px, 5vw, 64px); align-items: center;
+  padding: clamp(24px, 3.5vw, 48px);
+  margin: 0 0 clamp(48px, 7vw, 80px);
+  background: var(--color-accent-100);
+  border-radius: var(--radius-lg);
+}
+.mg-restore figure { aspect-ratio: 3/2; }
 .mg-card figure { transition: transform .25s ease; }
 .mg-card:hover figure { transform: translateY(-4px); }
 .mg-card:hover h3 { color: var(--color-accent-700); }
@@ -214,9 +223,11 @@ figure { margin: 0; }
   .mg-workgrid { grid-template-columns: repeat(2, 1fr); }
   .mg-about { grid-template-columns: 1fr; }
   .mg-about figure { max-width: 320px; }
+  .mg-restore { grid-template-columns: 1fr; }
 }
 @media (max-width: 620px) {
-  .mg-navlinks a:not(.mg-cta) { display: none; }
+  .mg-navlinks { gap: 12px; font-size: 14px; }
+  .mg-navlinks .mg-cta { padding: 7px 13px; white-space: nowrap; }
   .mg-workgrid { grid-template-columns: 1fr; }
   .mg-shoprow { grid-template-columns: 1fr; }
   .mg-gallery { grid-template-columns: repeat(2, 1fr); gap: 12px; }
