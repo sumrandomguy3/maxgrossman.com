@@ -54,7 +54,8 @@ Photos live in `images/originals/`, sorted into one folder per page (e.g.
    ```
 
    The `alt` text is a short description — it's what search engines and screen
-   readers see, so describe the piece.
+   readers see, **and it's the caption shown under the photo when someone
+   clicks to enlarge it**, so it's worth writing a real sentence.
 3. That's it — the photo shows up immediately. When you get a chance, run the
    build script (next section) or ask Claude to; it makes a smaller
    fast-loading copy of your photo and points the page at it. Until then the
@@ -89,6 +90,18 @@ The top nav and the footer appear on all 27 pages, but you only edit them in
 run the build script (or ask Claude) — it stamps your change into every page.
 Please don't edit the nav directly inside a page; the next build run would
 overwrite it.
+
+## The photo viewer
+
+Clicking any photo on a page opens it large in the middle of the screen, with
+arrows to step through every photo on that page and an X to close (the Esc key
+and the ← → keys work too, and you can swipe on a phone).
+
+There is nothing to switch on — `lightbox.js` is pulled into every page by the
+shared footer, so **any photo you add later gets this automatically**. The one
+thing to know: photos that are themselves links — the work cards on the
+homepage and the product cards in the shop — deliberately keep taking you to
+their page instead of enlarging.
 
 ## The contact form
 

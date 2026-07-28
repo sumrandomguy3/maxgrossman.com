@@ -255,6 +255,54 @@ textarea.input { resize: vertical; min-height: 130px; }
 .mg-field-error { font-size: 14px; font-weight: 600; margin: 0 0 14px; color: #8c2f1b; }
 @media (max-width: 620px) { .mg-field-pair { grid-template-columns: 1fr; gap: 0; } }
 
+/* — photo viewer (lightbox.js) — */
+.mg-zoomable { cursor: zoom-in; }
+.mg-zoomable:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.mg-lb {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(6px, 2vw, 22px); padding: clamp(14px, 3vw, 40px);
+  background: color-mix(in srgb, #22180d 92%, transparent);
+  backdrop-filter: blur(4px);
+}
+.mg-lb[hidden] { display: none; }
+.mg-lb-stage {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  margin: 0; max-width: min(1200px, 100%); max-height: 100%;
+}
+.mg-lb-img {
+  max-width: 100%; max-height: calc(100vh - 150px); width: auto; height: auto;
+  object-fit: contain; border-radius: var(--radius-md);
+  background: #fff; box-shadow: var(--shadow-lg);
+}
+.mg-lb-cap {
+  display: flex; gap: 14px; align-items: baseline; justify-content: center;
+  flex-wrap: wrap; text-align: center; font-size: 14px;
+  color: color-mix(in srgb, #f6f4ef 82%, transparent);
+}
+.mg-lb-count { font-variant-numeric: tabular-nums; opacity: .7; white-space: nowrap; }
+.mg-lb-btn {
+  flex: none; width: 46px; height: 46px; padding: 0; border-radius: 999px;
+  display: grid; place-items: center; cursor: pointer;
+  font-family: var(--font-body); font-size: 26px; line-height: 1; color: #f6f4ef;
+  border: 1px solid color-mix(in srgb, #f6f4ef 30%, transparent);
+  background: color-mix(in srgb, #f6f4ef 10%, transparent);
+}
+.mg-lb-btn:hover { background: color-mix(in srgb, #f6f4ef 22%, transparent); }
+.mg-lb-btn[hidden] { display: none; }
+.mg-lb-close {
+  position: absolute; top: clamp(14px, 3vw, 28px); right: clamp(14px, 3vw, 28px);
+  font-size: 24px;
+}
+@media (max-width: 620px) {
+  /* put the arrows under the photo so they don't squeeze it */
+  .mg-lb-btn { width: 42px; height: 42px; }
+  .mg-lb-prev, .mg-lb-next { position: absolute; bottom: clamp(14px, 4vw, 28px); }
+  .mg-lb-prev { left: 22px; }
+  .mg-lb-next { right: 22px; }
+  .mg-lb-img { max-height: calc(100vh - 200px); }
+}
+
 /* — portfolio (category) pages — */
 .mg-pagehero { padding: clamp(36px, 6vw, 72px) 0 clamp(20px, 3vw, 36px); max-width: 62ch; }
 .mg-pagehero h1 { font-size: clamp(38px, 5vw, 58px); line-height: 1.04; margin: 0 0 18px; letter-spacing: -.02em; }
