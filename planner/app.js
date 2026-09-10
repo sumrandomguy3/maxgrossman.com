@@ -1044,7 +1044,7 @@ function loadStartingSetup() {
     settings: { weeklyHours: 8, bufferWeeks: 0, machineHoursPerWeek: 30, updatedAt: now },
     products: [board, spoon, coaster, vaseSmall, vaseLarge, camera],
     markets: [{
-      id: uid(), name: 'September fair', date: '2026-09-19',
+      id: uid(), name: 'Bakers Street — September', date: '2026-09-19',
       notes: 'confirm load-in time', updatedAt: now,
       targets: {
         [board.id]: 3,
