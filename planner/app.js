@@ -68,7 +68,7 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 const blankState = () => ({
   version: 2,
-  settings: { weeklyHours: 8, bufferWeeks: 1, updatedAt: 0 },
+  settings: { weeklyHours: 8, bufferWeeks: 1, machineHoursPerWeek: 0, updatedAt: 0 },
   products: [],
   markets: [],
   commissions: [],
@@ -104,12 +104,14 @@ function normalize(data, now = Date.now()) {
 
   s.settings.weeklyHours = num(data.settings?.weeklyHours, 8);
   s.settings.bufferWeeks = num(data.settings?.bufferWeeks, 1);
+  s.settings.machineHoursPerWeek = Math.max(0, num(data.settings?.machineHoursPerWeek, 0));
   s.settings.updatedAt = stampOf(data.settings);
 
   s.products = (data.products || []).map((p) => ({
     id: p.id || uid(),
     name: String(p.name || 'Untitled'),
     hoursEach: Math.max(0, num(p.hoursEach, 1)),
+    machineHoursEach: Math.max(0, num(p.machineHoursEach, 0)),
     onHand: Math.max(0, Math.round(num(p.onHand, 0))),
     updatedAt: stampOf(p),
     deleted: !!p.deleted,
@@ -200,6 +202,13 @@ function computePlan(s) {
   const now = today0();
   const weeklyHours = Math.max(0, num(s.settings.weeklyHours, 0));
   const bufferWeeks = Math.max(0, num(s.settings.bufferWeeks, 0));
+  // Machine time is not your time. A CNC job running while you are at school
+  // costs the shop elapsed hours but costs you none, so it is counted against
+  // its own budget -- otherwise the planner tells you to cut work the machine
+  // could have carried. Zero means "not tracked": machine hours are still
+  // reported, they just do not constrain anything.
+  const machineWeekly = Math.max(0, num(s.settings.machineHoursPerWeek, 0));
+  const tracksMachine = machineWeekly > 0;
 
   const products = live(s.products);
   const stock = new Map(products.map((p) => [p.id, Math.max(0, p.onHand)]));
@@ -223,6 +232,7 @@ function computePlan(s) {
   const bump = (id, units) => perProductWeekly.set(id, (perProductWeekly.get(id) || 0) + units);
 
   let cumMakeHours = 0;
+  let cumMachineHours = 0;
   const rows = [];
 
   for (const { market, date } of upcoming) {
@@ -240,26 +250,38 @@ function computePlan(s) {
       committed.set(p.id, (committed.get(p.id) || 0) + fromStock);
       const toMake = target - fromStock;
       const hours = toMake * p.hoursEach;
+      const machineHours = toMake * (Number(p.machineHoursEach) || 0);
       // Units to put on the bench this week to land this line on time.
       const thisWeek = toMake === 0 ? 0
         : weeksLeft > 0 ? Math.min(toMake, Math.ceil(toMake / weeksLeft))
         : toMake;
       if (thisWeek > 0) bump(p.id, thisWeek);
-      lines.push({ product: p, target, fromStock, toMake, hours, thisWeek });
+      lines.push({ product: p, target, fromStock, toMake, hours, machineHours, thisWeek });
     }
 
     const makeHours = sum(lines.map((l) => l.hours));
+    const makeMachineHours = sum(lines.map((l) => l.machineHours));
     cumMakeHours += makeHours;
+    cumMachineHours += makeMachineHours;
 
     const commissionHours = sum(
       openCommissions.filter((c) => !c.due || c.due <= deadline).map((c) => c.commission.hours)
     );
     const demandHours = cumMakeHours + commissionHours;
     const capacityHours = Math.max(0, weeksLeft) * weeklyHours;
-    const ratio = capacityHours > 0 ? demandHours / capacityHours : (demandHours > 0 ? Infinity : 0);
+    const handRatio = capacityHours > 0 ? demandHours / capacityHours : (demandHours > 0 ? Infinity : 0);
+
+    const machineCapacityHours = Math.max(0, weeksLeft) * machineWeekly;
+    const machineRatio = !tracksMachine ? 0
+      : machineCapacityHours > 0 ? cumMachineHours / machineCapacityHours
+      : (cumMachineHours > 0 ? Infinity : 0);
+
+    // Whichever budget runs out first is the one that decides the date.
+    const ratio = Math.max(handRatio, machineRatio);
+    const machineBound = tracksMachine && machineRatio > handRatio;
 
     let status = 'ok';
-    if (demandHours <= 0) status = 'ok';
+    if (demandHours <= 0 && cumMachineHours <= 0) status = 'ok';
     else if (ratio > 1) status = 'behind';
     else if (ratio > 0.85) status = 'tight';
 
@@ -269,8 +291,12 @@ function computePlan(s) {
       lines,
       unitsToMake: sum(lines.map((l) => l.toMake)),
       makeHours, cumMakeHours, commissionHours, demandHours, capacityHours, ratio, status,
+      makeMachineHours, cumMachineHours, machineCapacityHours, machineRatio, handRatio,
+      tracksMachine, machineBound,
       paceNeeded: weeksLeft > 0 ? demandHours / weeksLeft : demandHours,
+      machinePaceNeeded: weeksLeft > 0 ? cumMachineHours / weeksLeft : cumMachineHours,
       shortfall: Math.max(0, demandHours - capacityHours),
+      machineShortfall: Math.max(0, cumMachineHours - machineCapacityHours),
       startBy: weeklyHours > 0 ? new Date(deadline.getTime() - (demandHours / weeklyHours) * MS_WEEK) : null,
     });
   }
@@ -279,7 +305,11 @@ function computePlan(s) {
   const weekProducts = products
     .map((p) => {
       const units = perProductWeekly.get(p.id) || 0;
-      return { product: p, units, hours: units * p.hoursEach };
+      return {
+        product: p, units,
+        hours: units * p.hoursEach,
+        machineHours: units * (Number(p.machineHoursEach) || 0),
+      };
     })
     .filter((x) => x.units > 0)
     .sort((a, b) => b.hours - a.hours);
@@ -296,6 +326,7 @@ function computePlan(s) {
     .sort((a, b) => b.hours - a.hours);
 
   const makeHours = sum(weekProducts.map((x) => x.hours));
+  const machineHours = sum(weekProducts.map((x) => x.machineHours));
   const commissionHours = sum(weekCommissions.map((x) => x.hours));
 
   return {
@@ -305,14 +336,18 @@ function computePlan(s) {
     thisWeek: {
       products: weekProducts,
       commissions: weekCommissions,
-      makeHours, commissionHours,
+      makeHours, commissionHours, machineHours,
       totalHours: makeHours + commissionHours,
       capacity: weeklyHours,
       over: makeHours + commissionHours - weeklyHours,
+      machineCapacity: machineWeekly,
+      machineOver: tracksMachine ? machineHours - machineWeekly : 0,
+      tracksMachine,
     },
     totals: {
       unitsToMake: sum(rows.map((r) => r.unitsToMake)),
       hoursToMake: sum(rows.map((r) => r.makeHours)),
+      machineHoursToMake: sum(rows.map((r) => r.makeMachineHours)),
     },
   };
 }
@@ -381,9 +416,16 @@ function weekCard(plan) {
 
     body.push(h('div', { class: `bar ${status}` }, h('i', { style: `width:${pct}%` })));
     body.push(h('p', { class: 'small muted', style: 'margin:8px 0 0' },
-      `${fmtHours(w.totalHours)} of work against ${fmtHours(w.capacity)} available`,
+      `${fmtHours(w.totalHours)} of your own time against ${fmtHours(w.capacity)} available`,
       w.commissionHours > 0 ? ` (${fmtHours(w.commissionHours)} of it commission work)` : '',
-      '.'));
+      '.',
+      w.tracksMachine && w.machineHours > 0.01
+        ? ` Plus ${fmtHours(w.machineHours)} on the machine, against ${fmtHours(w.machineCapacity)} of run time — that runs without you.`
+        : ''));
+    if (w.tracksMachine && w.machineOver > 0.05) {
+      body.push(h('div', { class: 'verdict tight' },
+        `The machine is ${fmtHours(w.machineOver)} over for the week. Queue a job before you leave in the morning, or add a weekend run.`));
+    }
 
     if (w.over > 0.05) {
       body.push(h('div', { class: 'verdict behind' },
@@ -418,6 +460,10 @@ function marketPlanCard(r) {
     h('div', { class: 'metric' }, h('b', { text: String(r.unitsToMake) }), h('span', { text: 'to make' })),
     h('div', { class: 'metric' }, h('b', { text: fmtHours(r.makeHours) }), h('span', { text: 'bench time' })),
     h('div', { class: 'metric' }, h('b', { text: fmtRate(r.paceNeeded) }), h('span', { text: 'hrs needed' })),
+    r.tracksMachine && r.makeMachineHours > 0.01
+      ? h('div', { class: `metric ${r.machineShortfall > 0.05 ? 'warn' : ''}` },
+          h('b', { text: fmtHours(r.makeMachineHours) }), h('span', { text: 'machine time' }))
+      : null,
     h('div', { class: `metric ${r.shortfall > 0.05 ? 'warn' : ''}` },
       h('b', { text: r.shortfall > 0.05 ? `-${fmtHours(r.shortfall)}` : fmtHours(Math.max(0, r.capacityHours - r.demandHours)) }),
       h('span', { text: r.shortfall > 0.05 ? 'short by' : 'slack' }))));
@@ -429,7 +475,10 @@ function marketPlanCard(r) {
     if (earlier > 0.01) parts.push(`${fmtHours(earlier)} for earlier markets`);
     if (r.commissionHours > 0.01) parts.push(`${fmtHours(r.commissionHours)} of commission work`);
     body.push(h('p', { class: 'tiny muted', style: 'margin:10px 0 0' },
-      `Pace and slack count every hour due by ${fmtDate(r.deadline)}: ${fmtHours(r.makeHours)} for this market plus ${parts.join(' and ')}.`));
+      `Pace and slack count every hands-on hour due by ${fmtDate(r.deadline)}: ${fmtHours(r.makeHours)} for this market plus ${parts.join(' and ')}.`,
+      r.tracksMachine && r.cumMachineHours > 0.01
+        ? ` Machine time is counted separately — ${fmtHours(r.cumMachineHours)} against ${fmtHours(r.machineCapacityHours)} of run time.`
+        : ''));
   }
 
   body.push(verdictFor(r));
@@ -441,7 +490,7 @@ function marketPlanCard(r) {
       l.toMake > 0
         ? h('span', { class: 'line-num' },
             h('b', { text: `make ${l.toMake}` }),
-            h('span', { class: 'muted tiny', text: ` · ${fmtHours(l.hours)}${l.fromStock ? ` · ${l.fromStock} from stock` : ''}` }))
+            h('span', { class: 'muted tiny', text: ` · ${fmtHours(l.hours)} hands-on${l.machineHours > 0.01 ? ` · ${fmtHours(l.machineHours)} machine` : ''}${l.fromStock ? ` · ${l.fromStock} from stock` : ''}` }))
         : h('span', { class: 'line-num line-ok tiny', text: `covered (${l.fromStock} from stock)` })))));
   } else {
     body.push(h('p', { class: 'small muted', style: 'margin:12px 0 0' },
@@ -458,6 +507,12 @@ function verdictFor(r) {
   if (r.weeksLeft <= 0) {
     return h('div', { class: 'verdict behind' },
       `Your finish-by date has passed. ${fmtHours(r.demandHours)} of work is still outstanding.`);
+  }
+  if (r.status === 'behind' && r.machineBound) {
+    return h('div', { class: 'verdict behind' },
+      `The machine is the bottleneck, not you. `,
+      `${fmtHours(r.cumMachineHours)} of run time is needed by then but only ${fmtHours(r.machineCapacityHours)} is available — `,
+      `${fmtHours(r.machineShortfall)} short. Start the jobs earlier in the day, run them at weekends too, or cut a target.`);
   }
   if (r.status === 'behind') {
     // Hours left for this build once commissions and earlier markets take their cut.
@@ -479,7 +534,11 @@ function verdictFor(r) {
         : `Latest you can start at full hours: ${fmtDate(startBy)} (${relDays(daysBetween(today0(), startBy))}).`)
     : 'Set your weekly hours in Settings to get a start-by date.';
   return h('div', { class: `verdict ${r.status}` },
-    `${fmtRate(r.paceNeeded)} of bench time gets you there. `, startTxt);
+    `${fmtRate(r.paceNeeded)} of bench time gets you there`,
+    r.tracksMachine && r.cumMachineHours > 0.01
+      ? `, with ${fmtRate(r.machinePaceNeeded)} of machine time alongside it. `
+      : '. ',
+    startTxt);
 }
 
 /* ---------------------------------------------------------------- stock view */
@@ -509,6 +568,7 @@ function viewStock(plan) {
       addRecord('products', {
         id: uid(), name,
         hoursEach: Math.max(0, num(f.hours.value, 1)),
+        machineHoursEach: Math.max(0, num(f.machinehours.value, 0)),
         onHand: Math.max(0, Math.round(num(f.onhand.value, 0))),
       });
     },
@@ -517,8 +577,10 @@ function viewStock(plan) {
     h('div', { class: 'row' },
       h('label', { class: 'field w-name' }, h('span', { text: 'Item' }),
         h('input', { type: 'text', name: 'name', placeholder: 'Cooking spoon', required: true })),
-      h('label', { class: 'field w-num' }, h('span', { text: 'Hours each' }),
+      h('label', { class: 'field w-num' }, h('span', { text: 'Hands-on hrs' }),
         h('input', { type: 'number', name: 'hours', min: '0', step: '0.25', value: '1', inputMode: 'decimal' })),
+      h('label', { class: 'field w-num' }, h('span', { text: 'Machine hrs' }),
+        h('input', { type: 'number', name: 'machinehours', min: '0', step: '0.25', value: '0', inputMode: 'decimal' })),
       h('label', { class: 'field w-num' }, h('span', { text: 'On hand' }),
         h('input', { type: 'number', name: 'onhand', min: '0', step: '1', value: '0', inputMode: 'numeric' })),
       h('button', { class: 'btn btn-primary', type: 'submit', style: 'align-self:flex-end' }, 'Add'))));
@@ -793,8 +855,19 @@ function viewSettings() {
             touch(st.settings);
           }),
         })),
-      h('p', { class: 'tiny muted', style: 'flex:1 1 200px;margin:0;align-self:flex-end' },
-        'Buffer weeks finish your build early, so oiling, pricing and packing are not part of the sprint.')))));
+      h('label', { class: 'field w-num' }, h('span', { text: 'Machine hrs / week' }),
+        h('input', {
+          type: 'number', min: '0', step: '1', value: String(s.machineHoursPerWeek || 0), inputMode: 'decimal',
+          onchange: (e) => update((st) => {
+            st.settings.machineHoursPerWeek = Math.max(0, num(e.target.value, st.settings.machineHoursPerWeek));
+            touch(st.settings);
+          }),
+        }))),
+    h('p', { class: 'tiny muted', style: 'margin:10px 0 0' },
+      'Buffer weeks finish your build early, so oiling, pricing and packing are not part of the sprint. ',
+      'Machine hours are the hours the CNC can run unattended in a week — while you are at school, say. ',
+      'They are counted separately, because a job running without you does not cost you bench time. ',
+      'Leave it at 0 if you would rather not track it.'))));
 
   out.push(syncCard());
 
@@ -952,10 +1025,13 @@ function loadStartingSetup() {
     if (!confirm('Replace what is here with the starting setup?')) return;
   }
   const now = Date.now();
-  const p = (name, hoursEach) => ({ id: uid(), name, hoursEach, onHand: 0, updatedAt: now });
+  const p = (name, hoursEach, machineHoursEach = 0) =>
+    ({ id: uid(), name, hoursEach, machineHoursEach, onHand: 0, updatedAt: now });
 
+  // Spoons are CNC work: a little setup and finishing from you, the rest run
+  // unattended. Split that way they cost you far less than the clock suggests.
   const board = p('Cutting board', 2.5);
-  const spoon = p('Hand-carved spoon', 1.5);
+  const spoon = p('Hand-carved spoon', 0.4, 1);
   const coaster = p('Coaster set (4)', 1.25);
   const vaseSmall = p('Bud vase — small', 1);
   const vaseLarge = p('Bud vase — large', 1.5);
@@ -965,7 +1041,7 @@ function loadStartingSetup() {
     version: 2,
     // No buffer: the fair is close enough that finishing a week early is not
     // on the table, and a buffer would put the finish-by date in the past.
-    settings: { weeklyHours: 8, bufferWeeks: 0, updatedAt: now },
+    settings: { weeklyHours: 8, bufferWeeks: 0, machineHoursPerWeek: 30, updatedAt: now },
     products: [board, spoon, coaster, vaseSmall, vaseLarge, camera],
     markets: [{
       id: uid(), name: 'September fair', date: '2026-09-19',
