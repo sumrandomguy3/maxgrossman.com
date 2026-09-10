@@ -578,9 +578,9 @@ function viewStock(plan) {
       h('label', { class: 'field w-name' }, h('span', { text: 'Item' }),
         h('input', { type: 'text', name: 'name', placeholder: 'Cooking spoon', required: true })),
       h('label', { class: 'field w-num' }, h('span', { text: 'Hands-on hrs' }),
-        h('input', { type: 'number', name: 'hours', min: '0', step: '0.25', value: '1', inputMode: 'decimal' })),
+        h('input', { type: 'number', name: 'hours', min: '0', step: '0.05', value: '1', inputMode: 'decimal' })),
       h('label', { class: 'field w-num' }, h('span', { text: 'Machine hrs' }),
-        h('input', { type: 'number', name: 'machinehours', min: '0', step: '0.25', value: '0', inputMode: 'decimal' })),
+        h('input', { type: 'number', name: 'machinehours', min: '0', step: '0.05', value: '0', inputMode: 'decimal' })),
       h('label', { class: 'field w-num' }, h('span', { text: 'On hand' }),
         h('input', { type: 'number', name: 'onhand', min: '0', step: '1', value: '0', inputMode: 'numeric' })),
       h('button', { class: 'btn btn-primary', type: 'submit', style: 'align-self:flex-end' }, 'Add'))));
@@ -603,13 +603,13 @@ function productCard(p, plan) {
         }),
         h('div', { class: 'row small muted', style: 'gap:6px;margin-top:2px' },
           h('input', {
-            type: 'number', min: '0', step: '0.25', value: String(p.hoursEach), inputMode: 'decimal',
+            type: 'number', min: '0', step: '0.05', value: String(p.hoursEach), inputMode: 'decimal',
             'aria-label': `${p.name} hands-on hours`, style: 'width:64px;padding:3px 6px',
             onchange: (e) => editRecord('products', p.id, (t) => { t.hoursEach = Math.max(0, num(e.target.value, t.hoursEach)); }),
           }),
           h('span', { text: 'hands-on' }),
           h('input', {
-            type: 'number', min: '0', step: '0.25', value: String(p.machineHoursEach || 0), inputMode: 'decimal',
+            type: 'number', min: '0', step: '0.05', value: String(p.machineHoursEach || 0), inputMode: 'decimal',
             'aria-label': `${p.name} machine hours`, style: 'width:64px;padding:3px 6px',
             onchange: (e) => editRecord('products', p.id, (t) => {
               t.machineHoursEach = Math.max(0, num(e.target.value, t.machineHoursEach || 0));
@@ -1041,14 +1041,16 @@ function loadStartingSetup() {
   const p = (name, hoursEach, machineHoursEach = 0) =>
     ({ id: uid(), name, hoursEach, machineHoursEach, onHand: 0, updatedAt: now });
 
-  // Spoons are CNC work: a little setup and finishing from you, the rest run
-  // unattended. Split that way they cost you far less than the clock suggests.
-  const board = p('Cutting board', 2.5);
-  const spoon = p('Hand-carved spoon', 0.4, 1);
+  // Measured, not guessed: a spoon is 3 min of CNC for the bowl and 8-10 min of
+  // bandsaw, edge and finish sanding; a camera 15 min including paint; boards
+  // 2 hours of working time for a batch of three.
+  const board = p('Cutting board', 0.67);
+  const spoon = p('Hand-carved spoon', 0.15, 0.05);
+  const camera = p('Toy camera', 0.25);
+  // Still estimates -- these three have not been timed yet.
   const coaster = p('Coaster set (4)', 1.25);
   const vaseSmall = p('Bud vase — small', 1);
   const vaseLarge = p('Bud vase — large', 1.5);
-  const camera = p('Toy camera', 1.5);
 
   // The same table at every market, as a starting point. Real numbers come
   // from what actually sells; these are only somewhere to start.
