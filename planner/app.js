@@ -112,6 +112,7 @@ function normalize(data, now = Date.now()) {
     name: String(p.name || 'Untitled'),
     hoursEach: Math.max(0, num(p.hoursEach, 1)),
     machineHoursEach: Math.max(0, num(p.machineHoursEach, 0)),
+    batchSize: Math.max(1, Math.round(num(p.batchSize, 1))),
     onHand: Math.max(0, Math.round(num(p.onHand, 0))),
     updatedAt: stampOf(p),
     deleted: !!p.deleted,
@@ -229,7 +230,9 @@ function computePlan(s) {
     .map((c) => ({ commission: c, due: parseDate(c.due) }));
 
   const perProductWeekly = new Map();
+  const perProductToMake = new Map();
   const bump = (id, units) => perProductWeekly.set(id, (perProductWeekly.get(id) || 0) + units);
+  const bumpTotal = (id, units) => perProductToMake.set(id, (perProductToMake.get(id) || 0) + units);
 
   let cumMakeHours = 0;
   let cumMachineHours = 0;
@@ -251,12 +254,19 @@ function computePlan(s) {
       const toMake = target - fromStock;
       const hours = toMake * p.hoursEach;
       const machineHours = toMake * (Number(p.machineHoursEach) || 0);
-      // Units to put on the bench this week to land this line on time.
-      const thisWeek = toMake === 0 ? 0
-        : weeksLeft > 0 ? Math.min(toMake, Math.ceil(toMake / weeksLeft))
+      // This line's share of a week, kept fractional. Rounding each market up
+      // to a whole unit before summing inflates badly: four markets each
+      // needing a quarter of a board a week became four boards a week.
+      const weeklyRate = toMake === 0 ? 0
+        : weeksLeft > 0 ? Math.min(toMake, toMake / weeksLeft)
         : toMake;
-      if (thisWeek > 0) bump(p.id, thisWeek);
-      lines.push({ product: p, target, fromStock, toMake, hours, machineHours, thisWeek });
+      if (weeklyRate > 0) bump(p.id, weeklyRate);
+      bumpTotal(p.id, toMake);
+      const batchSize = Math.max(1, num(p.batchSize, 1));
+      lines.push({
+        product: p, target, fromStock, toMake, hours, machineHours, weeklyRate, batchSize,
+        runs: batchSize > 1 && toMake > 0 ? Math.ceil(toMake / batchSize) : 0,
+      });
     }
 
     const makeHours = sum(lines.map((l) => l.hours));
@@ -304,9 +314,19 @@ function computePlan(s) {
   // What belongs on the bench this week, pulled across every upcoming market.
   const weekProducts = products
     .map((p) => {
-      const units = perProductWeekly.get(p.id) || 0;
+      // Sum the fractional shares first, then round once, at the end.
+      const outstanding = perProductToMake.get(p.id) || 0;
+      const pace = Math.min(outstanding, Math.ceil(perProductWeekly.get(p.id) || 0));
+      const batchSize = Math.max(1, num(p.batchSize, 1));
+      // You don't make two cameras, you run twelve. Round the week's share up
+      // to whole runs -- never past what is actually still owed, so the last
+      // run is allowed to be a short one.
+      const units = batchSize > 1 && pace > 0
+        ? Math.min(outstanding, Math.ceil(pace / batchSize) * batchSize)
+        : pace;
       return {
-        product: p, units,
+        product: p, units, batchSize,
+        runs: batchSize > 1 && units > 0 ? Math.ceil(units / batchSize) : 0,
         hours: units * p.hoursEach,
         machineHours: units * (Number(p.machineHoursEach) || 0),
       };
@@ -405,8 +425,12 @@ function weekCard(plan) {
       'Nothing needs to be on the bench this week to hit your targets.'));
   } else {
     body.push(h('ul', { class: 'lines' },
-      w.products.map(({ product, units, hours }) => h('li', {},
-        h('span', { class: 'line-name' }, h('b', { text: `${units}×` }), ' ', product.name),
+      w.products.map(({ product, units, hours, runs, batchSize }) => h('li', {},
+        h('span', { class: 'line-name' },
+          h('b', { text: `${units}×` }), ' ', product.name,
+          runs > 0
+            ? h('span', { class: 'muted tiny', text: ` · ${runs === 1 ? 'one run' : `${runs} runs`} of ${batchSize}` })
+            : null),
         h('span', { class: 'line-num muted tiny', text: fmtHours(hours) }))),
       w.commissions.map(({ commission, due }) => h('li', {},
         h('span', { class: 'line-name' },
@@ -490,7 +514,7 @@ function marketPlanCard(r) {
       l.toMake > 0
         ? h('span', { class: 'line-num' },
             h('b', { text: `make ${l.toMake}` }),
-            h('span', { class: 'muted tiny', text: ` · ${fmtHours(l.hours)} hands-on${l.machineHours > 0.01 ? ` · ${fmtHours(l.machineHours)} machine` : ''}${l.fromStock ? ` · ${l.fromStock} from stock` : ''}` }))
+            h('span', { class: 'muted tiny', text: ` · ${fmtHours(l.hours)} hands-on${l.machineHours > 0.01 ? ` · ${fmtHours(l.machineHours)} machine` : ''}${l.runs > 0 ? ` · ${l.runs === 1 ? 'one run' : `${l.runs} runs`} of ${l.batchSize}` : ''}${l.fromStock ? ` · ${l.fromStock} from stock` : ''}` }))
         : h('span', { class: 'line-num line-ok tiny', text: `covered (${l.fromStock} from stock)` })))));
   } else {
     body.push(h('p', { class: 'small muted', style: 'margin:12px 0 0' },
@@ -569,6 +593,7 @@ function viewStock(plan) {
         id: uid(), name,
         hoursEach: Math.max(0, num(f.hours.value, 1)),
         machineHoursEach: Math.max(0, num(f.machinehours.value, 0)),
+        batchSize: Math.max(1, Math.round(num(f.batchsize.value, 1))),
         onHand: Math.max(0, Math.round(num(f.onhand.value, 0))),
       });
     },
@@ -581,6 +606,8 @@ function viewStock(plan) {
         h('input', { type: 'number', name: 'hours', min: '0', step: '0.05', value: '1', inputMode: 'decimal' })),
       h('label', { class: 'field w-num' }, h('span', { text: 'Machine hrs' }),
         h('input', { type: 'number', name: 'machinehours', min: '0', step: '0.05', value: '0', inputMode: 'decimal' })),
+      h('label', { class: 'field w-num' }, h('span', { text: 'Per run' }),
+        h('input', { type: 'number', name: 'batchsize', min: '1', step: '1', value: '1', inputMode: 'numeric' })),
       h('label', { class: 'field w-num' }, h('span', { text: 'On hand' }),
         h('input', { type: 'number', name: 'onhand', min: '0', step: '1', value: '0', inputMode: 'numeric' })),
       h('button', { class: 'btn btn-primary', type: 'submit', style: 'align-self:flex-end' }, 'Add'))));
@@ -615,7 +642,15 @@ function productCard(p, plan) {
               t.machineHoursEach = Math.max(0, num(e.target.value, t.machineHoursEach || 0));
             }),
           }),
-          h('span', { text: 'machine, each' }))),
+          h('span', { text: 'machine, each' }),
+          h('input', {
+            type: 'number', min: '1', step: '1', value: String(p.batchSize || 1), inputMode: 'numeric',
+            'aria-label': `${p.name} batch size`, style: 'width:56px;padding:3px 6px',
+            onchange: (e) => editRecord('products', p.id, (t) => {
+              t.batchSize = Math.max(1, Math.round(num(e.target.value, t.batchSize || 1)));
+            }),
+          }),
+          h('span', { text: 'per run' }))),
       h('div', { class: 'row', style: 'gap:8px' },
         h('div', { class: 'stepper' },
           h('button', { type: 'button', 'aria-label': `One fewer ${p.name}`, onclick: () => setCount(p.onHand - 1) }, '−'),
@@ -1038,15 +1073,15 @@ function loadStartingSetup() {
     if (!confirm('Replace what is here with the starting setup?')) return;
   }
   const now = Date.now();
-  const p = (name, hoursEach, machineHoursEach = 0) =>
-    ({ id: uid(), name, hoursEach, machineHoursEach, onHand: 0, updatedAt: now });
+  const p = (name, hoursEach, machineHoursEach = 0, batchSize = 1) =>
+    ({ id: uid(), name, hoursEach, machineHoursEach, batchSize, onHand: 0, updatedAt: now });
 
   // Measured, not guessed: a spoon is 3 min of CNC for the bowl and 8-10 min of
   // bandsaw, edge and finish sanding; a camera 15 min including paint; boards
   // 2 hours of working time for a batch of three.
-  const board = p('Cutting board', 0.67);
+  const board = p('Cutting board', 0.67, 0, 3);
   const spoon = p('Hand-carved spoon', 0.15, 0.05);
-  const camera = p('Toy camera', 0.25);
+  const camera = p('Toy camera', 0.25, 0, 12);
   // Still estimates -- these three have not been timed yet.
   const coaster = p('Coaster set (4)', 1.25);
   const vaseSmall = p('Bud vase — small', 1);
