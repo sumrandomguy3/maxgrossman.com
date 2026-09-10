@@ -686,16 +686,7 @@ function viewMarkets(plan) {
             h('b', { text: market.name }),
             h('p', { class: 'tiny muted', style: 'margin:2px 0 0', text: date ? fmtDate(date) : 'no date set' })),
           h('div', { class: 'row', style: 'gap:6px' },
-            h('button', {
-              class: 'btn btn-sm', type: 'button',
-              onclick: () => {
-                const next = prompt(`Copy "${market.name}" targets to a new market. Date (YYYY-MM-DD)?`, toISO(new Date(Date.now() + 90 * MS_DAY)));
-                if (!next || !parseDate(next)) return;
-                addRecord('markets', {
-                  id: uid(), name: market.name, date: next, notes: market.notes, targets: { ...market.targets },
-                });
-              },
-            }, 'Repeat'),
+            h('button', { class: 'btn btn-sm', type: 'button', onclick: () => repeatMarket(market) }, 'Repeat'),
             h('button', {
               class: 'btn btn-sm btn-quiet btn-danger', type: 'button',
               onclick: () => {
@@ -706,6 +697,19 @@ function viewMarkets(plan) {
   }
 
   return out;
+}
+
+/* Clone a market's whole table to another date. Defaults to 364 days on --
+   52 weeks exactly, so an annual fair lands on the same weekday next year. */
+function repeatMarket(m) {
+  const from = parseDate(m.date) || today0();
+  const suggested = toISO(new Date(from.getTime() + 364 * MS_DAY));
+  const next = prompt(`Copy "${m.name}" and its targets to a new date (YYYY-MM-DD):`, suggested);
+  if (!next) return;
+  if (!parseDate(next)) { alert('That date did not look like YYYY-MM-DD.'); return; }
+  addRecord('markets', {
+    id: uid(), name: m.name, date: next, notes: m.notes, targets: { ...m.targets },
+  });
 }
 
 function marketEditCard(m, r) {
@@ -727,6 +731,7 @@ function marketEditCard(m, r) {
           type: 'date', value: m.date,
           onchange: (e) => editRecord('markets', m.id, (t) => { if (e.target.value) t.date = e.target.value; }),
         })),
+      h('button', { class: 'btn btn-sm', type: 'button', onclick: () => repeatMarket(m) }, 'Repeat'),
       h('button', {
         class: 'btn btn-sm btn-quiet btn-danger', type: 'button',
         onclick: () => {
@@ -1037,24 +1042,32 @@ function loadStartingSetup() {
   const vaseLarge = p('Bud vase — large', 1.5);
   const camera = p('Toy camera', 1.5);
 
+  // The same table at every market, as a starting point. Real numbers come
+  // from what actually sells; these are only somewhere to start.
+  const targets = {
+    [board.id]: 3,
+    [spoon.id]: 20,
+    [coaster.id]: 12,
+    [vaseSmall.id]: 6,
+    [vaseLarge.id]: 4,
+    [camera.id]: 4,
+  };
+  const market = (name, date, notes) =>
+    ({ id: uid(), name, date, notes, updatedAt: now, targets: { ...targets } });
+
   state = {
     version: 2,
-    // No buffer: the fair is close enough that finishing a week early is not
+    // No buffer: the nearest fair is close enough that finishing a week early
+    // is not
     // on the table, and a buffer would put the finish-by date in the past.
     settings: { weeklyHours: 8, bufferWeeks: 0, machineHoursPerWeek: 30, updatedAt: now },
     products: [board, spoon, coaster, vaseSmall, vaseLarge, camera],
-    markets: [{
-      id: uid(), name: 'Bakers Street — September', date: '2026-09-19',
-      notes: 'confirm load-in time', updatedAt: now,
-      targets: {
-        [board.id]: 3,
-        [spoon.id]: 20,
-        [coaster.id]: 12,
-        [vaseSmall.id]: 6,
-        [vaseLarge.id]: 4,
-        [camera.id]: 4,
-      },
-    }],
+    markets: [
+      market('Bakers Street — September', '2026-09-19', 'confirm load-in time'),
+      market('Montclair winter market', '2026-12-05', 'date estimated — first Saturday in December'),
+      market('Bakers Street — Spring', '2027-05-15', 'date estimated — mid-May Saturday'),
+      market('West Orange street fair', '2027-06-05', 'date estimated — first Saturday in June'),
+    ],
     commissions: [],
   };
   save();
