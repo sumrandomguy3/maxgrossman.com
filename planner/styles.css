@@ -54,11 +54,20 @@ body {
 }
 h1, h2, h3 { font-weight: 700; letter-spacing: -0.015em; line-height: 1.14; }
 
-.wrap { width: 100%; max-width: 860px; margin: 0 auto; padding-inline: 16px; }
+.wrap {
+  width: 100%; max-width: 860px; margin: 0 auto;
+  /* Keep clear of rounded corners and the camera notch when launched from the
+     home screen, where the page runs full-bleed with no browser chrome. */
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
 
 /* ---------- chrome ---------- */
 
-.topbar { border-bottom: 1px solid var(--border); background: var(--surface); }
+.topbar {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding-top: env(safe-area-inset-top);
+}
 .topbar-inner {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; flex-wrap: wrap; padding-block: 14px;
@@ -89,7 +98,10 @@ h1 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
 .tab.is-active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
 
 main { padding-block: 20px 40px; display: flex; flex-direction: column; gap: 18px; }
-.foot { color: var(--muted); font-size: 12.5px; padding-bottom: 32px; }
+.foot {
+  color: var(--muted); font-size: 12.5px;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
 .foot p { margin: 0; }
 
 /* ---------- generic blocks ---------- */
