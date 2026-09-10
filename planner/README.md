@@ -16,6 +16,9 @@ Source, full documentation and tests live in the
 Change it there, then copy `index.html`, `styles.css`, `app.js` and `sync.js` back
 into this folder.
 
+**Setting this up for the first time? See [`SETUP.md`](SETUP.md)** — every step
+in plain English, no terminal needed.
+
 ## Using it on more than one device
 
 Out of the box each browser keeps its own separate copy — the phone and the laptop
