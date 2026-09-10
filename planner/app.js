@@ -548,7 +548,7 @@ function viewStock(plan) {
 
   out.push(h('div', { class: 'section-head' },
     h('h2', { text: 'What you make' }),
-    h('p', { text: 'Hours-each drives every estimate. Keep counts honest — update them after a build session and after a market.' })));
+    h('p', { text: 'Both rates drive every estimate: hands-on is your time, machine runs without you. Keep counts honest — update them after a build session and after a market.' })));
 
   if (liveProducts().length) {
     out.push(h('div', { class: 'stack' }, liveProducts().map((p) => productCard(p, plan))));
@@ -604,10 +604,18 @@ function productCard(p, plan) {
         h('div', { class: 'row small muted', style: 'gap:6px;margin-top:2px' },
           h('input', {
             type: 'number', min: '0', step: '0.25', value: String(p.hoursEach), inputMode: 'decimal',
-            'aria-label': 'Hours each', style: 'width:72px;padding:3px 6px',
+            'aria-label': `${p.name} hands-on hours`, style: 'width:64px;padding:3px 6px',
             onchange: (e) => editRecord('products', p.id, (t) => { t.hoursEach = Math.max(0, num(e.target.value, t.hoursEach)); }),
           }),
-          h('span', { text: 'hours each' }))),
+          h('span', { text: 'hands-on' }),
+          h('input', {
+            type: 'number', min: '0', step: '0.25', value: String(p.machineHoursEach || 0), inputMode: 'decimal',
+            'aria-label': `${p.name} machine hours`, style: 'width:64px;padding:3px 6px',
+            onchange: (e) => editRecord('products', p.id, (t) => {
+              t.machineHoursEach = Math.max(0, num(e.target.value, t.machineHoursEach || 0));
+            }),
+          }),
+          h('span', { text: 'machine, each' }))),
       h('div', { class: 'row', style: 'gap:8px' },
         h('div', { class: 'stepper' },
           h('button', { type: 'button', 'aria-label': `One fewer ${p.name}`, onclick: () => setCount(p.onHand - 1) }, '−'),
