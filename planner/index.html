@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bench — market production planner</title>
+<meta name="color-scheme" content="light dark">
+<!-- Personal tool, not part of the public site: keep it out of search results. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Per-market inventory targets, current counts, and the pace needed to close the gap before the date.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div>
+      <h1>Bench</h1>
+      <p class="tagline">market production planner</p>
+    </div>
+    <div class="chips">
+      <div class="capsule" id="sync-chip" hidden></div>
+      <div class="capsule" id="capacity-chip"></div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs" aria-label="Sections">
+  <div class="wrap tabs-inner">
+    <button type="button" class="tab is-active" data-view="plan">Plan</button>
+    <button type="button" class="tab" data-view="stock">Stock</button>
+    <button type="button" class="tab" data-view="markets">Markets</button>
+    <button type="button" class="tab" data-view="commissions">Commissions</button>
+    <button type="button" class="tab" data-view="settings">Settings</button>
+  </div>
+</nav>
+
+<main class="wrap" id="app"></main>
+
+<footer class="wrap foot">
+  <p id="foot-note">Everything is stored in this browser only. Export a backup from <strong>Settings</strong> now and then.</p>
+</footer>
+
+<script src="app.js"></script>
+<script src="sync.js"></script>
+</body>
+</html>
