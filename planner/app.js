@@ -327,11 +327,12 @@ function viewPlan(plan) {
       h('strong', { text: 'Nothing to plan yet' }),
       h('p', { class: 'small', style: 'margin:6px 0 14px' },
         'Add what you make under ', h('b', { text: 'Stock' }),
-        ', then add a market with a date and per-item targets.'),
+        ', then add a market with a date and per-item targets. Or load your usual ',
+        'market goods and the September fair as a starting point.'),
       h('button', { class: 'btn btn-sm', onclick: () => { go(liveProducts().length ? 'markets' : 'stock'); } },
         liveProducts().length ? 'Add a market' : 'Add your first item'),
       ' ',
-      h('button', { class: 'btn btn-sm', onclick: loadExample }, 'Load an example')));
+      h('button', { class: 'btn btn-sm', onclick: loadStartingSetup }, 'Load starting setup')));
     return out;
   }
 
@@ -386,7 +387,10 @@ function weekCard(plan) {
 
     if (w.over > 0.05) {
       body.push(h('div', { class: 'verdict behind' },
-        `You are ${fmtHours(w.over)} short this week. Either find the time, trim a target, or push a commission out — leaving it will cost you at the next market.`));
+        `You are ${fmtHours(w.over)} short this week. `,
+        w.commissionHours > 0.01
+          ? 'Either find the time, trim a target, or push a commission out — leaving it will cost you at the next market.'
+          : 'Either find the time or trim a target — leaving it will cost you at the market.'));
     }
   }
 
@@ -463,7 +467,10 @@ function verdictFor(r) {
     const canDo = Math.min(r.unitsToMake, Math.floor(forThisBuild / hoursPerPiece));
     return h('div', { class: 'verdict behind' },
       `Needs ${fmtRate(r.paceNeeded)} but only ${fmtHours(r.capacityHours)} remain before the finish-by date — ${fmtHours(r.shortfall)} short. `,
-      `At your current hours you arrive with about ${canDo} of ${r.unitsToMake} pieces. Start now, cut the target, or clear a commission.`);
+      `At your current hours you arrive with about ${canDo} of ${r.unitsToMake} pieces. `,
+      r.commissionHours > 0.01
+        ? 'Start now, cut the target, or clear a commission.'
+        : 'Start now, or cut the target.');
   }
   const startBy = r.startBy;
   const startTxt = startBy
@@ -794,13 +801,15 @@ function viewSettings() {
   out.push(h('section', { class: 'card' }, h('div', { class: 'card-body' },
     h('h2', { style: 'margin:0 0 4px;font-size:16px', text: 'Your data' }),
     h('p', { class: 'small muted', style: 'margin:0 0 12px' },
-      'Saved in this browser only. Clearing site data wipes it — keep an exported copy somewhere safe.'),
+      'Saved in this browser only. Clearing site data wipes it — keep an exported copy somewhere safe. ',
+      h('em', {}, 'Load starting setup'),
+      ' fills in your usual market goods with placeholder hours — correct them under Stock.'),
     h('div', { class: 'row' },
       h('button', { class: 'btn', type: 'button', onclick: exportJSON }, 'Export backup'),
       h('button', { class: 'btn', type: 'button', onclick: copyJSON }, 'Copy as JSON'),
       h('label', { class: 'btn', style: 'cursor:pointer' }, 'Import backup',
         h('input', { type: 'file', accept: 'application/json,.json', style: 'display:none', onchange: importJSON })),
-      h('button', { class: 'btn', type: 'button', onclick: loadExample }, 'Load example data'),
+      h('button', { class: 'btn', type: 'button', onclick: loadStartingSetup }, 'Load starting setup'),
       h('button', {
         class: 'btn btn-danger', type: 'button',
         onclick: () => {
@@ -933,39 +942,47 @@ function importJSON(e) {
   e.target.value = '';
 }
 
-function loadExample() {
+/* The starting setup: Max's usual market goods and the next fair.
+   The hours-each figures are placeholders -- they are the one thing only he
+   can supply, and every number in the app derives from them, so the app says
+   so rather than letting a guess pass for a measurement. Shelf counts start at
+   zero for the same reason: better to show nothing than to invent stock. */
+function loadStartingSetup() {
   if (liveProducts().length || live(state.markets).length) {
-    if (!confirm('Replace what is here with example data?')) return;
+    if (!confirm('Replace what is here with the starting setup?')) return;
   }
-  const at = (days) => toISO(new Date(today0().getTime() + days * MS_DAY));
   const now = Date.now();
-  const p = (name, hoursEach, onHand) => ({ id: uid(), name, hoursEach, onHand, updatedAt: now });
-  const spoon = p('Cooking spoon', 1.5, 6);
-  const spatula = p('Spatula', 1.25, 3);
-  const scoop = p('Small scoop', 0.75, 0);
-  const board = p('Serving board', 2.5, 2);
+  const p = (name, hoursEach) => ({ id: uid(), name, hoursEach, onHand: 0, updatedAt: now });
+
+  const board = p('Cutting board', 2.5);
+  const spoon = p('Hand-carved spoon', 1.5);
+  const coaster = p('Coaster set (4)', 1.25);
+  const vaseSmall = p('Bud vase — small', 1);
+  const vaseLarge = p('Bud vase — large', 1.5);
+  const camera = p('Toy camera', 1.5);
 
   state = {
-    version: 1,
-    settings: { weeklyHours: 8, bufferWeeks: 1, updatedAt: now },
-    products: [spoon, spatula, scoop, board],
-    markets: [
-      {
-        id: uid(), name: 'Riverside Summer Market', date: at(38), notes: 'one day, indoors', updatedAt: now,
-        targets: { [spoon.id]: 10, [spatula.id]: 6, [scoop.id]: 8 },
+    version: 2,
+    // No buffer: the fair is close enough that finishing a week early is not
+    // on the table, and a buffer would put the finish-by date in the past.
+    settings: { weeklyHours: 8, bufferWeeks: 0, updatedAt: now },
+    products: [board, spoon, coaster, vaseSmall, vaseLarge, camera],
+    markets: [{
+      id: uid(), name: 'September fair', date: '2026-09-19',
+      notes: 'confirm load-in time', updatedAt: now,
+      targets: {
+        [board.id]: 3,
+        [spoon.id]: 20,
+        [coaster.id]: 12,
+        [vaseSmall.id]: 6,
+        [vaseLarge.id]: 4,
+        [camera.id]: 4,
       },
-      {
-        id: uid(), name: 'West Orange Fall Fair', date: at(96), notes: 'two days, the big one', updatedAt: now,
-        targets: { [spoon.id]: 24, [spatula.id]: 14, [scoop.id]: 20, [board.id]: 8 },
-      },
-    ],
-    commissions: [
-      { id: uid(), name: 'Wedding spoon set', hours: 9, due: at(21), done: false, updatedAt: now },
-      { id: uid(), name: 'Restaurant board order', hours: 12, due: at(52), done: false, updatedAt: now },
-    ],
+    }],
+    commissions: [],
   };
   save();
-  go('plan');
+  go('stock');
 }
 
 /* ------------------------------------------------------------------- render */

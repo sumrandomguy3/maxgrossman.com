@@ -1,0 +1,15 @@
+{
+  "name": "Bench — market production planner",
+  "short_name": "Bench",
+  "description": "Per-market inventory targets, current counts, and the pace needed to close the gap.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#dcdcda",
+  "theme_color": "#322a20",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
