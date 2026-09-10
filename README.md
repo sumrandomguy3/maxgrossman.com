@@ -20,6 +20,7 @@ plain-English guide to changing text, photos and prices.**
 | `styles.css` | Design tokens (colors, fonts, spacing) and all component styles |
 | `partials/` | The one shared copy of the nav bar and footer (synced into pages by `tools/build.py`) |
 | `tools/build.py` | The only "build step": syncs partials into pages and makes web-sized photo copies |
+| `planner/` | Private production planner for markets — unlisted, not linked from the site, `noindex`. See [`planner/README.md`](planner/README.md) |
 | `images/` | Curated photos used by the homepage, plus `logo.png` |
 | `images/originals/` | Full archive of all 248 photos from the old Squarespace site, organized by page |
 | `images/web/` | Auto-generated fast-loading copies of the originals — the pages serve these |
