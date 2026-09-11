@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markets — Max Grossman Designs</title>
+<meta name="description" content="Where to find the Max Grossman Designs booth — craft markets and street fairs around Essex County, NJ. Hand-carved spoons, boards, toys, vases and leather goods.">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/favicon-180.png">
+<link rel="stylesheet" href="styles.css?v=10">
+</head>
+<body>
+
+  <!-- nav:start (shared nav — edit partials/nav.html, then run: python3 tools/build.py) -->
+  <nav class="mg-nav">
+  <div class="mg-wrap mg-navrow">
+    <a href="index.html" class="mg-brand" aria-label="Max Grossman Designs"><img src="images/logo-table.png" alt="" class="mg-logo"><span class="mg-brand-text">Max Grossman Designs</span></a>
+    <div class="mg-navlinks">
+      <a href="index.html#work">Work</a>
+      <a href="restoration.html" class="mg-nav-wide">Restoration</a>
+      <a href="shop.html">Shop</a>
+      <a href="markets.html">Markets</a>
+      <a href="index.html#about" class="mg-nav-narrow">About</a>
+      <a href="contact.html" class="btn btn-primary mg-cta">Get in touch</a>
+    </div>
+  </div>
+</nav>
+  <!-- nav:end -->
+
+  <div class="mg-wrap">
+    <header class="mg-pagehero">
+      <span class="mg-kicker">Markets</span>
+      <h1>Where to find me</h1>
+      <p>Most of what I make gets sold in person, across a handful of markets and street fairs around Essex County. Come pick something up — the spoons in particular are made to be held, and that's hard to do through a screen. If you're thinking about a commission or have a piece that needs restoring, the booth is a good place to start that conversation.</p>
+    </header>
+
+    <!-- ─────────────────────────────────────────────────────────────────
+         TO ADD A MARKET: copy one <article> block below and change the
+         four things — data-date, the three date parts, the name, and the
+         town. Keep data-date in YYYY-MM-DD form; the page uses it to drop
+         markets into "Previously" automatically once they've passed, so
+         an old date can never sit here looking current.
+         TO REMOVE ONE: delete its <article> block.
+    ────────────────────────────────────────────────────────────────── -->
+
+    <section class="mg-markets-sec">
+      <h2>Coming up</h2>
+
+      <div id="mg-upcoming" class="mg-marketlist">
+
+        <article class="mg-market" data-date="2026-09-19">
+          <div class="mg-market-when">
+            <span class="mg-market-dow">Sat</span>
+            <span class="mg-market-day">19</span>
+            <span class="mg-market-mon">Sep 2026</span>
+          </div>
+          <div class="mg-market-what">
+            <h3>Bakers Street Flea</h3>
+            <p class="mg-market-where">Maplewood, NJ</p>
+            <p>The big one. Spoons, cutting boards, bud vases, wooden toys and leather goods, with a piece of furniture along for company.</p>
+            <!-- Add booth times or a street address here once they're confirmed. -->
+          </div>
+        </article>
+
+      </div>
+
+      <p id="mg-none" class="mg-market-none" hidden>
+        Nothing on the calendar at the moment — the next season's dates go up as they're confirmed.
+        <a href="contact.html">Get in touch</a> any time in the meantime.
+      </p>
+    </section>
+
+    <section id="mg-past-wrap" class="mg-markets-sec" hidden>
+      <h2>Previously</h2>
+      <div id="mg-past" class="mg-marketlist mg-marketlist-past"></div>
+    </section>
+
+    <section class="mg-markets-sec">
+      <h2>Also around the area</h2>
+      <p class="mg-market-also">I show up through the year at the <strong>West Orange Street Fair</strong>, the <strong>West Orange farmers markets</strong>, and the <strong>South Orange holiday markets</strong>. Dates get posted here once they're set, and on <a href="https://www.instagram.com/mcgrossman" rel="noopener">Instagram</a> as they come round.</p>
+      <p class="mg-market-also">Can't make it to a market? The <a href="shop.html">shop</a> has a small selection, and <a href="contact.html">custom work and restoration</a> start with a conversation.</p>
+    </section>
+
+  </div>
+
+  <!-- footer:start (shared footer — edit partials/footer.html, then run: python3 tools/build.py) -->
+  <footer class="mg-footer">
+  <div class="mg-wrap mg-footrow">
+    <span class="mg-footname">Max Grossman</span>
+    <span>Designer &amp; maker of fine furniture · West Orange, NJ · © 2026</span>
+  </div>
+</footer>
+<script src="lightbox.js" defer></script>
+  <!-- footer:end -->
+
+  <script>
+    /* Move markets whose date has passed into "Previously", and order what's
+       left soonest-first. With JavaScript off every market simply stays listed
+       under "Coming up" with its date printed, which is still correct, just
+       not self-tidying. */
+    (function () {
+      var list = document.getElementById('mg-upcoming');
+      var past = document.getElementById('mg-past');
+      if (!list || !past) return;
+
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      function on(card) {
+        var parts = String(card.getAttribute('data-date') || '').split('-');
+        var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+        return isNaN(d) ? null : d;
+      }
+
+      var cards = Array.prototype.slice.call(list.querySelectorAll('.mg-market'));
+      var upcoming = [];
+
+      cards.forEach(function (card) {
+        var when = on(card);
+        if (when && when < today) past.appendChild(card); else upcoming.push(card);
+      });
+
+      upcoming.sort(function (a, b) { return on(a) - on(b); })
+              .forEach(function (card) { list.appendChild(card); });
+
+      document.getElementById('mg-none').hidden = upcoming.length > 0;
+      document.getElementById('mg-past-wrap').hidden = past.children.length === 0;
+    })();
+  </script>
+
+</body>
+</html>
