@@ -72,6 +72,42 @@ figure { margin: 0; }
 
 .washed { filter: saturate(0.6) contrast(0.85) brightness(1.1) opacity(0.94); }
 
+/* — markets — */
+.mg-markets-sec { padding: 0 0 clamp(32px, 5vw, 56px); }
+.mg-markets-sec h2 {
+  font-size: clamp(20px, 2.4vw, 26px); margin: 0 0 var(--space-4);
+  padding-bottom: var(--space-2); border-bottom: 1px solid var(--color-divider);
+}
+.mg-marketlist { display: flex; flex-direction: column; gap: var(--space-3); }
+.mg-market {
+  display: grid; grid-template-columns: 92px 1fr; gap: var(--space-4);
+  align-items: start;
+  background: var(--color-surface); border-radius: var(--radius-md);
+  padding: var(--space-4); box-shadow: var(--shadow-sm);
+}
+.mg-market-when {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; background: var(--color-accent-100);
+  border-radius: var(--radius-sm); padding: var(--space-3) var(--space-2);
+  font-family: var(--font-heading); line-height: 1.05;
+}
+.mg-market-dow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--color-accent-600); }
+.mg-market-day { font-size: 30px; font-weight: 800; color: var(--color-accent-800); }
+.mg-market-mon { font-size: 12px; letter-spacing: .04em; color: var(--color-accent-600); }
+.mg-market-what h3 { font-size: 19px; margin: 0 0 2px; }
+.mg-market-what p { margin: 0 0 var(--space-2); }
+.mg-market-what p:last-child { margin-bottom: 0; }
+.mg-market-where {
+  font-size: 13px; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--color-accent-600); font-weight: 600;
+}
+.mg-market-none, .mg-market-also { margin: 0 0 var(--space-3); max-width: 62ch; }
+.mg-marketlist-past .mg-market { opacity: .62; box-shadow: none; }
+@media (max-width: 720px) {
+  .mg-market { grid-template-columns: 68px 1fr; gap: var(--space-3); padding: var(--space-3); }
+  .mg-market-day { font-size: 24px; }
+}
+
 /* — buttons — */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -121,7 +157,7 @@ figure { margin: 0; }
   background: color-mix(in srgb, var(--color-bg) 88%, transparent);
   backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-divider);
 }
-.mg-navrow { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; }
+.mg-navrow { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px 0; }
 .mg-brand { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; }
 .mg-logo { height: 50px; width: auto; display: block; }
 .mg-brand-text { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: clamp(17px, 2vw, 23px); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.05; white-space: nowrap; }
@@ -331,10 +367,19 @@ textarea.input { resize: vertical; min-height: 130px; }
   .mg-about figure { max-width: 320px; }
   .mg-restore { grid-template-columns: 1fr; }
 }
+/* Adding Markets made the row one link too wide, so it now sheds links
+   sooner: Restoration first (it has its own nav entry on desktop only), then
+   About, which is an anchor on the homepage and reachable by scrolling. */
+@media (max-width: 860px) { .mg-navlinks .mg-nav-wide { display: none; } }
+@media (max-width: 560px) { .mg-navlinks .mg-nav-narrow { display: none; } }
+@media (max-width: 380px) {
+  .mg-navlinks { gap: 8px; font-size: 13px; }
+  .mg-navlinks .mg-cta { padding: 6px 9px; }
+  .mg-navrow { gap: 10px; }
+}
 @media (max-width: 620px) {
   .mg-navlinks { gap: 12px; font-size: 14px; }
   .mg-navlinks .mg-cta { padding: 7px 13px; white-space: nowrap; }
-  .mg-navlinks .mg-nav-wide { display: none; }
   .mg-workgrid { grid-template-columns: 1fr; }
   .mg-shoprow { grid-template-columns: 1fr; }
   .mg-gallery { grid-template-columns: repeat(2, 1fr); gap: 12px; }
