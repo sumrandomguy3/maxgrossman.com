@@ -1136,18 +1136,21 @@ function loadStartingSetup() {
   // oil. 15 min for a set of four.
   const coaster = p('Coaster set (4)', 0.25, 0, 1, 'min');
 
-  // The same table at every market, as a starting point. Real numbers come
-  // from what actually sells; these are only somewhere to start.
-  const targets = {
-    [board.id]: 3,
-    [spoon.id]: 20,
-    [coaster.id]: 12,
-    [vaseSmall.id]: 6,
-    [vaseLarge.id]: 4,
-    [camera.id]: 4,
-  };
-  const market = (name, date, notes) =>
-    ({ id: uid(), name, date, notes, updatedAt: now, targets: { ...targets } });
+  // Targets differ by venue, because the venues differ. Bakers Street in
+  // Maplewood absorbs spoons the hometown fair will not -- sellouts around 28
+  // against 4-18 at West Orange, where the receipt book says toys and cutting
+  // boards are the actual movers. Sending the same table to both is how you
+  // end up carrying the wrong stock to the right market.
+  const table = (spoons, boards, cameras, coasters, vSmall, vLarge) => ({
+    [spoon.id]: spoons,
+    [board.id]: boards,
+    [camera.id]: cameras,
+    [coaster.id]: coasters,
+    [vaseSmall.id]: vSmall,
+    [vaseLarge.id]: vLarge,
+  });
+  const market = (name, date, notes, targets) =>
+    ({ id: uid(), name, date, notes, updatedAt: now, targets });
 
   state = {
     version: 2,
@@ -1157,10 +1160,18 @@ function loadStartingSetup() {
     settings: { weeklyHours: 8, bufferWeeks: 0, machineHoursPerWeek: 30, updatedAt: now },
     products: [board, spoon, coaster, vaseSmall, vaseLarge, camera],
     markets: [
-      market('Bakers Street — September', '2026-09-19', 'confirm load-in time'),
-      market('Montclair winter market', '2026-12-05', 'date estimated — first Saturday in December'),
-      market('Bakers Street — Spring', '2027-05-15', 'date estimated — mid-May Saturday'),
-      market('West Orange street fair', '2027-06-05', 'date estimated — first Saturday in June'),
+      market('Bakers Street Flea — Maplewood', '2026-09-19',
+        'best market of the year · $200 booth fee · spoon target 30-35',
+        table(30, 4, 6, 12, 8, 6)),
+      market('Montclair Lackawanna Plaza', '2026-12-05',
+        'UNCONFIRMED — under evaluation, no sales history · date estimated',
+        table(10, 3, 4, 8, 4, 3)),
+      market('Bakers Street Flea — Spring', '2027-05-15',
+        'date estimated — mid-May Saturday',
+        table(30, 4, 6, 12, 8, 6)),
+      market('West Orange street fair', '2027-06-05',
+        'hometown · toys and boards are the movers here, not spoons · date estimated',
+        table(15, 8, 10, 10, 4, 3)),
     ],
     commissions: [],
   };
