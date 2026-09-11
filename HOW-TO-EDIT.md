@@ -118,11 +118,19 @@ site goes live — submit the form once as a test and click the confirmation.
 
 ## Shop changes
 
-- **Change a price:** edit the product's page (`shop-<name>.html`) — update the
-  visible price in `<div class="mg-price-lg">$25.00</div>` **and** the hidden
-  checkout amount `<input type="hidden" name="amount" value="25.00">` — and
-  then the price on its card in `shop.html`. (Also on `index.html` if the
+- **Change a price:** a price lives in **four** places and all four must agree.
+  On the product's page (`shop-<name>.html`):
+  1. the visible price, `<div class="mg-price-lg">$25.00</div>`
+  2. the checkout amount PayPal actually charges,
+     `<input type="hidden" name="amount" value="25.00">`
+  3. `data-price="25.00"` on the same form — this is the figure quoted in the
+     order email if PayPal checkout is ever switched off
+
+  then 4. the price on its card in `shop.html`. (Also on `index.html` if the
   product is one of the three featured there.)
+
+  Changing only the visible price is the dangerous mistake: the page would
+  advertise one price while PayPal charged another.
 - **Retire a product:** delete its card from `shop.html`. The product page can
   stay (dead pages hurt nothing) or be deleted too.
 - **New product:** copy an existing product page's contents into a new file
