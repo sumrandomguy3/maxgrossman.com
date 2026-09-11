@@ -1132,8 +1132,9 @@ function loadStartingSetup() {
   const vaseSmall = p('Bud vase — small', vaseHands, vaseMachine, 3, 'min');
   const vaseLarge = p('Bud vase — large', vaseHands, vaseMachine, 3, 'min');
 
-  // Still an estimate -- coasters have not been timed yet.
-  const coaster = p('Coaster set (4)', 1.25);
+  // Branch cookies dried in the shop for years: debark, sand, dunk in mineral
+  // oil. 15 min for a set of four.
+  const coaster = p('Coaster set (4)', 0.25, 0, 1, 'min');
 
   // The same table at every market, as a starting point. Real numbers come
   // from what actually sells; these are only somewhere to start.
