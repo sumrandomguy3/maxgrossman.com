@@ -44,11 +44,24 @@ const fmtDate = (d) => d.toLocaleDateString(undefined, { month: 'short', day: 'n
 const weeksBetween = (a, b) => (b - a) / MS_WEEK;
 const daysBetween = (a, b) => Math.round((b - a) / MS_DAY);
 
+/* Under an hour, say it in minutes. "18 min" is a thing you can picture;
+   "0.3 hr" is a number you have to convert in your head. */
 function fmtHours(x) {
   if (!Number.isFinite(x)) return '—';
-  const r = Math.abs(x) < 10 ? Math.round(x * 10) / 10 : Math.round(x);
+  const mag = Math.abs(x);
+  if (mag > 0 && mag < 1) {
+    const mins = Math.round(x * 60);
+    if (Math.abs(mins) >= 1) return `${mins} min`;
+  }
+  const r = mag < 10 ? Math.round(x * 10) / 10 : Math.round(x);
   return `${r} hr`;
 }
+
+/* Rates are always stored in hours. Each item just chooses how it prefers to
+   be typed and read -- a spoon in minutes, a batch of boards in hours. */
+const UNITS = { min: 60, hr: 1 };
+const inUnit = (hours, unit) => Math.round(hours * (UNITS[unit] || 1) * 1000) / 1000;
+const toHours = (value, unit) => value / (UNITS[unit] || 1);
 function fmtRate(x) {
   if (!Number.isFinite(x)) return '—';
   return `${Math.round(x * 10) / 10}/wk`;
@@ -113,6 +126,7 @@ function normalize(data, now = Date.now()) {
     hoursEach: Math.max(0, num(p.hoursEach, 1)),
     machineHoursEach: Math.max(0, num(p.machineHoursEach, 0)),
     batchSize: Math.max(1, Math.round(num(p.batchSize, 1))),
+    timeUnit: p.timeUnit === 'min' ? 'min' : 'hr',
     onHand: Math.max(0, Math.round(num(p.onHand, 0))),
     updatedAt: stampOf(p),
     deleted: !!p.deleted,
@@ -315,15 +329,19 @@ function computePlan(s) {
   const weekProducts = products
     .map((p) => {
       // Sum the fractional shares first, then round once, at the end.
+      const rate = perProductWeekly.get(p.id) || 0;
       const outstanding = perProductToMake.get(p.id) || 0;
-      const pace = Math.min(outstanding, Math.ceil(perProductWeekly.get(p.id) || 0));
       const batchSize = Math.max(1, num(p.batchSize, 1));
-      // You don't make two cameras, you run twelve. Round the week's share up
-      // to whole runs -- never past what is actually still owed, so the last
-      // run is allowed to be a short one.
-      const units = batchSize > 1 && pace > 0
-        ? Math.min(outstanding, Math.ceil(pace / batchSize) * batchSize)
-        : pace;
+      // You don't make two cameras, you run twelve. Work in whole runs, and
+      // pick the nearest count rather than always rounding up: needing 3.04
+      // boards a week should be one run of three, not two. A week that falls
+      // a little short simply raises next week's rate, so it self-corrects --
+      // whereas always rounding up doubles the bench for a 4% overshoot.
+      // Never schedule past what is still owed, so a final run may be short.
+      const units = rate <= 0 ? 0
+        : batchSize > 1
+          ? Math.min(outstanding, Math.max(1, Math.round(rate / batchSize)) * batchSize)
+          : Math.min(outstanding, Math.ceil(rate));
       return {
         product: p, units, batchSize,
         runs: batchSize > 1 && units > 0 ? Math.ceil(units / batchSize) : 0,
@@ -589,10 +607,11 @@ function viewStock(plan) {
       const f = e.target;
       const name = f.name.value.trim();
       if (!name) return;
+      const unit = f.timeunit.value === 'min' ? 'min' : 'hr';
       addRecord('products', {
-        id: uid(), name,
-        hoursEach: Math.max(0, num(f.hours.value, 1)),
-        machineHoursEach: Math.max(0, num(f.machinehours.value, 0)),
+        id: uid(), name, timeUnit: unit,
+        hoursEach: Math.max(0, toHours(num(f.hours.value, 1), unit)),
+        machineHoursEach: Math.max(0, toHours(num(f.machinehours.value, 0), unit)),
         batchSize: Math.max(1, Math.round(num(f.batchsize.value, 1))),
         onHand: Math.max(0, Math.round(num(f.onhand.value, 0))),
       });
@@ -602,10 +621,14 @@ function viewStock(plan) {
     h('div', { class: 'row' },
       h('label', { class: 'field w-name' }, h('span', { text: 'Item' }),
         h('input', { type: 'text', name: 'name', placeholder: 'Cooking spoon', required: true })),
-      h('label', { class: 'field w-num' }, h('span', { text: 'Hands-on hrs' }),
+      h('label', { class: 'field w-num' }, h('span', { text: 'Hands-on' }),
         h('input', { type: 'number', name: 'hours', min: '0', step: '0.05', value: '1', inputMode: 'decimal' })),
-      h('label', { class: 'field w-num' }, h('span', { text: 'Machine hrs' }),
+      h('label', { class: 'field w-num' }, h('span', { text: 'Machine' }),
         h('input', { type: 'number', name: 'machinehours', min: '0', step: '0.05', value: '0', inputMode: 'decimal' })),
+      h('label', { class: 'field w-num' }, h('span', { text: 'Unit' }),
+        h('select', { name: 'timeunit' },
+          h('option', { value: 'hr', text: 'hours' }),
+          h('option', { value: 'min', text: 'minutes' }))),
       h('label', { class: 'field w-num' }, h('span', { text: 'Per run' }),
         h('input', { type: 'number', name: 'batchsize', min: '1', step: '1', value: '1', inputMode: 'numeric' })),
       h('label', { class: 'field w-num' }, h('span', { text: 'On hand' }),
@@ -619,6 +642,7 @@ function productCard(p, plan) {
   const committed = plan.committed.get(p.id) || 0;
   const free = Math.max(0, p.onHand - committed);
   const setCount = (n) => editRecord('products', p.id, (t) => { t.onHand = Math.max(0, Math.round(n)); });
+  const unit = p.timeUnit === 'min' ? 'min' : 'hr';
 
   return h('article', { class: 'card' }, h('div', { class: 'card-body' },
     h('div', { class: 'spread' },
@@ -630,19 +654,31 @@ function productCard(p, plan) {
         }),
         h('div', { class: 'row small muted', style: 'gap:6px;margin-top:2px' },
           h('input', {
-            type: 'number', min: '0', step: '0.05', value: String(p.hoursEach), inputMode: 'decimal',
-            'aria-label': `${p.name} hands-on hours`, style: 'width:64px;padding:3px 6px',
-            onchange: (e) => editRecord('products', p.id, (t) => { t.hoursEach = Math.max(0, num(e.target.value, t.hoursEach)); }),
+            type: 'number', min: '0', step: unit === 'min' ? '1' : '0.05', inputMode: 'decimal',
+            value: String(inUnit(p.hoursEach, unit)),
+            'aria-label': `${p.name} hands-on ${unit === 'min' ? 'minutes' : 'hours'}`,
+            style: 'width:64px;padding:3px 6px',
+            onchange: (e) => editRecord('products', p.id, (t) => {
+              t.hoursEach = Math.max(0, toHours(num(e.target.value, inUnit(t.hoursEach, unit)), unit));
+            }),
           }),
           h('span', { text: 'hands-on' }),
           h('input', {
-            type: 'number', min: '0', step: '0.05', value: String(p.machineHoursEach || 0), inputMode: 'decimal',
-            'aria-label': `${p.name} machine hours`, style: 'width:64px;padding:3px 6px',
+            type: 'number', min: '0', step: unit === 'min' ? '1' : '0.05', inputMode: 'decimal',
+            value: String(inUnit(p.machineHoursEach || 0, unit)),
+            'aria-label': `${p.name} machine ${unit === 'min' ? 'minutes' : 'hours'}`,
+            style: 'width:64px;padding:3px 6px',
             onchange: (e) => editRecord('products', p.id, (t) => {
-              t.machineHoursEach = Math.max(0, num(e.target.value, t.machineHoursEach || 0));
+              t.machineHoursEach = Math.max(0, toHours(num(e.target.value, inUnit(t.machineHoursEach || 0, unit)), unit));
             }),
           }),
-          h('span', { text: 'machine, each' }),
+          h('span', { text: 'machine' }),
+          h('select', {
+            'aria-label': `${p.name} time unit`, style: 'width:64px;padding:3px 4px',
+            onchange: (e) => editRecord('products', p.id, (t) => { t.timeUnit = e.target.value === 'min' ? 'min' : 'hr'; }),
+          },
+            h('option', { value: 'min', selected: unit === 'min', text: 'min' }),
+            h('option', { value: 'hr', selected: unit === 'hr', text: 'hr' })),
           h('input', {
             type: 'number', min: '1', step: '1', value: String(p.batchSize || 1), inputMode: 'numeric',
             'aria-label': `${p.name} batch size`, style: 'width:56px;padding:3px 6px',
@@ -1073,15 +1109,16 @@ function loadStartingSetup() {
     if (!confirm('Replace what is here with the starting setup?')) return;
   }
   const now = Date.now();
-  const p = (name, hoursEach, machineHoursEach = 0, batchSize = 1) =>
-    ({ id: uid(), name, hoursEach, machineHoursEach, batchSize, onHand: 0, updatedAt: now });
+  const p = (name, hoursEach, machineHoursEach = 0, batchSize = 1, timeUnit = 'hr') =>
+    ({ id: uid(), name, hoursEach, machineHoursEach, batchSize, timeUnit, onHand: 0, updatedAt: now });
 
   // Measured, not guessed: a spoon is 3 min of CNC for the bowl and 8-10 min of
   // bandsaw, edge and finish sanding; a camera 15 min including paint; boards
   // 2 hours of working time for a batch of three.
   const board = p('Cutting board', 0.67, 0, 3);
-  const spoon = p('Hand-carved spoon', 0.15, 0.05);
-  const camera = p('Toy camera', 0.25, 0, 12);
+  const spoon = p('Hand-carved spoon', 0.15, 0.05, 1, 'min');   //  9 min hands-on, 3 min cycle
+
+  const camera = p('Toy camera', 0.25, 0, 12, 'min');          // 15 min including paint
   // Still estimates -- these three have not been timed yet.
   const coaster = p('Coaster set (4)', 1.25);
   const vaseSmall = p('Bud vase — small', 1);
