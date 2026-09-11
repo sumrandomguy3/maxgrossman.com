@@ -60,7 +60,10 @@ function fmtHours(x) {
 /* Rates are always stored in hours. Each item just chooses how it prefers to
    be typed and read -- a spoon in minutes, a batch of boards in hours. */
 const UNITS = { min: 60, hr: 1 };
-const inUnit = (hours, unit) => Math.round(hours * (UNITS[unit] || 1) * 1000) / 1000;
+const inUnit = (hours, unit) => {
+  const places = unit === 'min' ? 100 : 1000;
+  return Math.round(hours * (UNITS[unit] || 1) * places) / places;
+};
 const toHours = (value, unit) => value / (UNITS[unit] || 1);
 function fmtRate(x) {
   if (!Number.isFinite(x)) return '—';
@@ -1119,10 +1122,18 @@ function loadStartingSetup() {
   const spoon = p('Hand-carved spoon', 0.15, 0.05, 1, 'min');   //  9 min hands-on, 3 min cycle
 
   const camera = p('Toy camera', 0.25, 0, 12, 'min');          // 15 min including paint
-  // Still estimates -- these three have not been timed yet.
+  // One pass over the vase blanks yields three small and three large together:
+  // 20 min of milling, drilling and sanding, plus 8 min of machine time for
+  // the pockets. The two sizes are tracked separately here, so that shared run
+  // is split evenly across the six pieces it produces.
+  const VASE_RUN = { pieces: 6, handsMin: 20, machineMin: 8 };
+  const vaseHands = VASE_RUN.handsMin / 60 / VASE_RUN.pieces;
+  const vaseMachine = VASE_RUN.machineMin / 60 / VASE_RUN.pieces;
+  const vaseSmall = p('Bud vase — small', vaseHands, vaseMachine, 3, 'min');
+  const vaseLarge = p('Bud vase — large', vaseHands, vaseMachine, 3, 'min');
+
+  // Still an estimate -- coasters have not been timed yet.
   const coaster = p('Coaster set (4)', 1.25);
-  const vaseSmall = p('Bud vase — small', 1);
-  const vaseLarge = p('Bud vase — large', 1.5);
 
   // The same table at every market, as a starting point. Real numbers come
   // from what actually sells; these are only somewhere to start.
