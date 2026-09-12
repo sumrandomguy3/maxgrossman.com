@@ -158,10 +158,29 @@ figure { margin: 0; }
   backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-divider);
 }
 .mg-navrow { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px 0; }
-.mg-brand { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; }
-.mg-logo { height: 50px; width: auto; display: block; }
+.mg-brand { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; flex: none; }
+/* flex: none matters. The 2025 mark is far wider than it is tall, so as a
+   flex item it was being shrunk to fit and squashed out of proportion --
+   at phone widths it clipped to a sliver. It keeps its aspect now, and the
+   sizes below make sure it actually fits rather than being crushed into place. */
+.mg-logo { height: 50px; width: auto; display: block; flex: none; }
 .mg-brand-text { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: clamp(17px, 2vw, 23px); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.05; white-space: nowrap; }
-@media (max-width: 620px) { .mg-logo { height: 40px; } .mg-brand { gap: 10px; } .mg-brand-text { display: none; } }
+/* The wordmark is the first thing to go: the mark is wide, and the name is
+   repeated in the page itself. Then the mark steps down with the viewport. */
+@media (max-width: 900px) { .mg-brand-text { display: none; } .mg-brand { gap: 10px; } }
+@media (max-width: 860px) { .mg-logo { height: 44px; } }
+/* Below this the bar simply cannot hold the mark and every link on one line --
+   at 320px it wants 421px. Rather than hide half the navigation or crush the
+   mark, the row wraps: brand above, links centred beneath, wrapping again if
+   they must. Nothing is lost and nothing is distorted. */
+@media (max-width: 470px) {
+  /* The bar is sticky, so a two-row nav has to stay compact or it eats a
+     tenth of the screen for the whole visit. Tighter padding and a slightly
+     smaller mark keep it near 80px. */
+  .mg-navrow { flex-wrap: wrap; justify-content: flex-start; row-gap: 8px; padding: 8px 0; }
+  .mg-navlinks { width: 100%; justify-content: flex-start; flex-wrap: wrap; row-gap: 8px; }
+  .mg-logo { height: 36px; }
+}
 .mg-navlinks { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 600; }
 .mg-navlinks a { color: var(--color-text); text-decoration: none; }
 .mg-navlinks a:hover { color: var(--color-accent-700); }
