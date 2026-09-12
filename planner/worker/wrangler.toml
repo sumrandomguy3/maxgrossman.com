@@ -5,17 +5,12 @@ name = "bench-sync"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 
-# Created by: npx wrangler kv namespace create BENCH
-# Paste the id it prints here.
 [[kv_namespaces]]
 binding = "BENCH"
-id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"
+id = "c4624b27646d47358cdc833229c8964f"
 
 [vars]
-# Leave empty when the Worker runs on your own domain (same origin as the page).
-# If you use the *.workers.dev URL instead, put your site's origin here, e.g.
-#   ALLOWED_ORIGIN = "https://maxgrossman.com"
-ALLOWED_ORIGIN = ""
+ALLOWED_ORIGIN = "https://maxgrossman.com,https://www.maxgrossman.com,https://sumrandomguy3.github.io"
 
 # Same-origin option — only works when maxgrossman.com's DNS is on Cloudflare.
 # Uncomment and the page can call a plain relative "/api/bench" with no CORS.
