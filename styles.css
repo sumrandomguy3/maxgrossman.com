@@ -206,23 +206,25 @@ figure { margin: 0; }
    it does not inherit the smaller size set on .mg-navlinks. */
 @media (max-width: 470px) {
   .mg-navrow { gap: 10px; }
-  .mg-navlinks { gap: 7px; font-size: 12px; }
+  /* Archivo arrives with font-display: swap, so the bar is measured in the
+     fallback face first -- wider on some systems. Letting the links wrap
+     inside their own box means that moment costs a taller bar for an instant,
+     never a page that scrolls sideways. */
+  .mg-navlinks { gap: 7px; font-size: 12px; flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
   .mg-navlinks .mg-cta { padding: 6px 8px; font-size: 12px; }
   .mg-logo { height: 28px; }
 }
 /* The last squeeze before wrapping: a smaller mark and tighter link spacing
-   buy about 20px, which is what keeps 370-389px on one line. */
+   buy about 20px, which is what keeps 340-389px on one line. */
 @media (max-width: 389px) {
   .mg-navlinks { gap: 6px; }
   .mg-navlinks .mg-cta { padding: 6px 7px; }
   .mg-logo { height: 24px; }
 }
-/* At 369px and below even a 24px mark, three links and the pill will not
-   share a line -- measured, the content wants ~9px more than the bar has.
-   (A one-row bar at 320px would need the mark down to 11px tall.)
-   Rather than hide navigation or crush the mark, the row wraps: brand above,
-   links beneath. Nothing is lost and nothing is distorted. */
-@media (max-width: 369px) {
+/* At 339px and below even a 24px mark, three links and the pill will not
+   share a line. Rather than hide navigation or crush the mark, the row wraps:
+   brand above, links beneath. Nothing is lost and nothing is distorted. */
+@media (max-width: 339px) {
   .mg-navrow { flex-wrap: wrap; justify-content: flex-start; row-gap: 8px; padding-block: 8px; }
   .mg-navlinks { width: 100%; justify-content: flex-start; flex-wrap: wrap; row-gap: 8px; }
   .mg-logo { height: 32px; }
