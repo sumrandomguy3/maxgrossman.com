@@ -157,7 +157,10 @@ figure { margin: 0; }
   background: color-mix(in srgb, var(--color-bg) 88%, transparent);
   backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-divider);
 }
-.mg-navrow { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px 0; }
+/* The nav row is a .mg-wrap, but its own `padding` shorthand was zeroing the
+   wrap's side gutter, so the mark sat hard against the screen edge at every
+   width. Restate the gutter here so the logo lines up with the page content. */
+.mg-navrow { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px clamp(20px, 4vw, 72px); }
 .mg-brand { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; flex: none; }
 /* flex: none matters. The 2025 mark is far wider than it is tall, so as a
    flex item it was being shrunk to fit and squashed out of proportion --
@@ -165,27 +168,65 @@ figure { margin: 0; }
    sizes below make sure it actually fits rather than being crushed into place. */
 .mg-logo { height: 50px; width: auto; display: block; flex: none; }
 .mg-brand-text { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: clamp(17px, 2vw, 23px); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.05; white-space: nowrap; }
-/* The wordmark is the first thing to go: the mark is wide, and the name is
-   repeated in the page itself. Then the mark steps down with the viewport. */
-@media (max-width: 900px) { .mg-brand-text { display: none; } .mg-brand { gap: 10px; } }
-@media (max-width: 860px) { .mg-logo { height: 44px; } }
-/* Below this the bar simply cannot hold the mark and every link on one line --
-   at 320px it wants 421px. Rather than hide half the navigation or crush the
-   mark, the row wraps: brand above, links centred beneath, wrapping again if
-   they must. Nothing is lost and nothing is distorted. */
-@media (max-width: 470px) {
-  /* The bar is sticky, so a two-row nav has to stay compact or it eats a
-     tenth of the screen for the whole visit. Tighter padding and a slightly
-     smaller mark keep it near 80px. */
-  .mg-navrow { flex-wrap: wrap; justify-content: flex-start; row-gap: 8px; padding: 8px 0; }
-  .mg-navlinks { width: 100%; justify-content: flex-start; flex-wrap: wrap; row-gap: 8px; }
-  .mg-logo { height: 36px; }
-}
 .mg-navlinks { display: flex; align-items: center; gap: 28px; font-size: 15px; font-weight: 600; }
 .mg-navlinks a { color: var(--color-text); text-decoration: none; }
 .mg-navlinks a:hover { color: var(--color-accent-700); }
 /* the "Get in touch" pill: keep the primary-button light text, not the nav-link ink */
 .mg-navlinks a.btn-primary, .mg-navlinks a.btn-primary:hover { color: var(--color-on-accent); }
+
+/* --- the nav's responsive cascade, widest first, all of it here ---
+   These share a specificity with the base rules above, so order is the only
+   thing separating them: a nav rule anywhere further down the sheet wins
+   silently. Two used to live down in the page-layout media queries and were
+   quietly cancelling this block. Keep nav sizing in this one place. */
+
+/* The wordmark is the first thing to go: the mark is wide, and the name is
+   repeated in the page itself. Then the mark steps down with the viewport. */
+@media (max-width: 1140px) { .mg-brand-text { display: none; } .mg-brand { gap: 10px; } }
+@media (max-width: 1140px) { .mg-logo { height: 44px; } }
+/* Adding Markets made the row one link too wide, so it sheds links sooner:
+   Restoration first (it has its own nav entry on desktop only), then About,
+   which is an anchor on the homepage and reachable by scrolling. */
+@media (max-width: 860px) { .mg-navlinks .mg-nav-wide { display: none; } }
+@media (max-width: 620px) {
+  .mg-navlinks { gap: 12px; font-size: 14px; }
+  .mg-navlinks .mg-cta { padding: 7px 13px; white-space: nowrap; }
+}
+@media (max-width: 580px) { .mg-navlinks .mg-nav-narrow { display: none; } }
+/* Large-phone / small-tablet step, between the desktop bar and the compact
+   phone one. Without it the bar overflowed by ~14px just above 470px. */
+@media (max-width: 520px) {
+  .mg-navlinks { gap: 10px; font-size: 13px; }
+  .mg-navlinks .mg-cta { padding: 6px 11px; font-size: 13px; }
+  .mg-logo { height: 36px; }
+}
+/* One compact row on a phone. The bar is sticky, so its height is worth more
+   than a large mark: 51px here against 85px for a wrapped two-row bar.
+   The pill needs its own font-size: .btn sets one directly on the element, so
+   it does not inherit the smaller size set on .mg-navlinks. */
+@media (max-width: 470px) {
+  .mg-navrow { gap: 10px; }
+  .mg-navlinks { gap: 7px; font-size: 12px; }
+  .mg-navlinks .mg-cta { padding: 6px 8px; font-size: 12px; }
+  .mg-logo { height: 28px; }
+}
+/* The last squeeze before wrapping: a smaller mark and tighter link spacing
+   buy about 20px, which is what keeps 370-389px on one line. */
+@media (max-width: 389px) {
+  .mg-navlinks { gap: 6px; }
+  .mg-navlinks .mg-cta { padding: 6px 7px; }
+  .mg-logo { height: 24px; }
+}
+/* At 369px and below even a 24px mark, three links and the pill will not
+   share a line -- measured, the content wants ~9px more than the bar has.
+   (A one-row bar at 320px would need the mark down to 11px tall.)
+   Rather than hide navigation or crush the mark, the row wraps: brand above,
+   links beneath. Nothing is lost and nothing is distorted. */
+@media (max-width: 369px) {
+  .mg-navrow { flex-wrap: wrap; justify-content: flex-start; row-gap: 8px; padding-block: 8px; }
+  .mg-navlinks { width: 100%; justify-content: flex-start; flex-wrap: wrap; row-gap: 8px; }
+  .mg-logo { height: 32px; }
+}
 .mg-hero {
   display: grid; grid-template-columns: 1.05fr .95fr;
   gap: clamp(28px, 5vw, 64px); align-items: center;
@@ -386,19 +427,7 @@ textarea.input { resize: vertical; min-height: 130px; }
   .mg-about figure { max-width: 320px; }
   .mg-restore { grid-template-columns: 1fr; }
 }
-/* Adding Markets made the row one link too wide, so it now sheds links
-   sooner: Restoration first (it has its own nav entry on desktop only), then
-   About, which is an anchor on the homepage and reachable by scrolling. */
-@media (max-width: 860px) { .mg-navlinks .mg-nav-wide { display: none; } }
-@media (max-width: 560px) { .mg-navlinks .mg-nav-narrow { display: none; } }
-@media (max-width: 380px) {
-  .mg-navlinks { gap: 8px; font-size: 13px; }
-  .mg-navlinks .mg-cta { padding: 6px 9px; }
-  .mg-navrow { gap: 10px; }
-}
 @media (max-width: 620px) {
-  .mg-navlinks { gap: 12px; font-size: 14px; }
-  .mg-navlinks .mg-cta { padding: 7px 13px; white-space: nowrap; }
   .mg-workgrid { grid-template-columns: 1fr; }
   .mg-shoprow { grid-template-columns: 1fr; }
   .mg-gallery { grid-template-columns: repeat(2, 1fr); gap: 12px; }
