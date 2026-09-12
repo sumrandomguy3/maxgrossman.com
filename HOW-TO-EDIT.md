@@ -116,6 +116,25 @@ you a one-time **"activate this form"** confirmation. Click it once and every
 submission after that lands in your inbox. Worth doing yourself right after the
 site goes live — submit the form once as a test and click the confirmation.
 
+## Changing the logo
+
+The nav shows `images/logo-mark.png`, which is generated — don't edit it by
+hand. Upload the new drawing to `images/` (black on white is fine, transparency
+not needed) and run:
+
+```sh
+python3 tools/make-logo.py "images/your-new-drawing.png"
+```
+
+That knocks out the white background, tints it the site brown and writes
+`images/logo-mark.png` at the right size. It also prints how wide the mark
+will sit in the nav — if that grows a lot, check the nav still fits on a
+phone, since the bar is tight at small widths.
+
+Keep detail in mind: anything thinner than about 3% of the drawing's height
+disappears at nav size. The thin line under the table top is the first thing
+to go.
+
 ## Shop changes
 
 - **Change a price:** a price lives in **four** places and all four must agree.
