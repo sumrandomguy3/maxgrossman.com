@@ -68,58 +68,67 @@ def page(body, css=''):
 """
 
 
-# — Main: 48 x 25 mm, the common 57x25 die-cut label —
+HANDLE = '@mcgrossman'
+SITE = 'maxgrossman.com'
+
+
+def handle(size_px, extra=''):
+    return (f'<div style="font-size: {size_px}px; font-weight: 800; letter-spacing: 0.01em; '
+            f'line-height: 1; white-space: nowrap{extra}">{HANDLE}</div>')
+
+
+def site(size_px, extra=''):
+    return (f'<div style="font-size: {size_px}px; font-weight: 600; letter-spacing: 0.1em; '
+            f'text-transform: uppercase; white-space: nowrap{extra}">{SITE}</div>')
+
+
+def rule(width, thickness=3, extra=''):
+    return f'<div style="width: {width}; height: {thickness}px; background: #000000; flex: none{extra}"></div>'
+
+
+# — Main: 48 x 25 mm, the everyday bag sticker —
 MAIN = f"""<div class="sticker" style="padding: 13px 15px; align-items: center; gap: 15px">
-  <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 9px; flex: 1; min-width: 0">
-    {mark(182)}
-    <div style="display: flex; flex-direction: column; align-items: flex-start">
-      <div style="font-size: 31px; font-weight: 800; letter-spacing: 0.04em; line-height: 0.98; text-transform: uppercase">Max</div>
-      <div style="font-size: 31px; font-weight: 800; letter-spacing: 0.04em; line-height: 0.98; text-transform: uppercase">Grossman</div>
-    </div>
-    <div style="width: 100%; height: 3px; background: #000000"></div>
-    <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase">maxgrossman.com</div>
+  <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; flex: 1; min-width: 0">
+    {mark(189)}
+    {handle(24)}
+    {rule('100%')}
+    {site(14)}
   </div>
-  {qr(154)}
+  {qr(150)}
 </div>"""
 
 # — Square: 48 x 48 mm, framed shop stamp —
 SQUARE = f"""<div class="sticker" style="padding: 10px">
   <div style="flex: 1; border: 3px solid #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px 22px">
     {mark(250)}
-    <div style="font-size: 32px; font-weight: 800; letter-spacing: 0.05em; line-height: 1; text-transform: uppercase; margin-top: 12px">Max Grossman</div>
-    <div style="width: 100%; height: 3px; background: #000000; margin: 12px 0 6px"></div>
+    {handle(40, '; margin-top: 12px')}
+    {rule('100%', 3, '; margin: 12px 0 6px')}
     {qr(152)}
-    <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 0">maxgrossman.com</div>
+    {site(14)}
   </div>
 </div>"""
 
 # — Tall: 48 x 64 mm, the roomy one —
 TALL = f"""<div class="sticker" style="padding: 30px 26px 26px; flex-direction: column; align-items: center">
-  {mark(290)}
-  <div style="display: flex; flex-direction: column; align-items: center; margin-top: 22px">
-    <div style="font-size: 46px; font-weight: 800; letter-spacing: 0.03em; line-height: 0.96; text-transform: uppercase">Max</div>
-    <div style="font-size: 36px; font-weight: 800; letter-spacing: 0.03em; line-height: 1; text-transform: uppercase">Grossman</div>
-  </div>
-  <div style="width: 64px; height: 4px; background: #000000; margin: 18px 0 4px"></div>
-  {qr(200)}
-  <div style="font-size: 16px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px">maxgrossman.com</div>
+  {mark(310)}
+  {handle(42, '; margin-top: 22px')}
+  {rule('64px', 4, '; margin: 18px 0 4px')}
+  {qr(220)}
+  {site(16, '; margin-top: 2px')}
 </div>"""
 
-# — Seal: 48 x 16 mm, no QR, for sealing a bag flap —
-SEAL = f"""<div class="sticker" style="padding: 14px 16px; align-items: center; gap: 12px">
-  {mark(150)}
-  <div style="width: 3px; height: 62px; background: #000000; flex: none"></div>
-  <div style="display: flex; flex-direction: column; align-items: flex-start; flex: 1; min-width: 0">
-    <div style="font-size: 29px; font-weight: 800; letter-spacing: 0.04em; line-height: 1; text-transform: uppercase">Max</div>
-    <div style="font-size: 29px; font-weight: 800; letter-spacing: 0.04em; line-height: 1; text-transform: uppercase">Grossman</div>
-  </div>
+# — Seal: 48 x 14 mm, no QR, for sealing a bag flap —
+SEAL = f"""<div class="sticker" style="padding: 12px 16px; align-items: center; gap: 12px">
+  {mark(140)}
+  {rule('3px', 0, '; width: 3px; height: 44px')}
+  {handle(24)}
 </div>"""
 
 BOARDS = [
     ('Main',   MAIN,   384, 200, '48 x 25 mm'),
     ('Square', SQUARE, 384, 384, '48 x 48 mm'),
     ('Tall',   TALL,   384, 512, '48 x 64 mm'),
-    ('Seal',   SEAL,   384, 128, '48 x 16 mm'),
+    ('Seal',   SEAL,   384, 112, '48 x 14 mm'),
 ]
 
 
