@@ -1,0 +1,16 @@
+# vendored just to screenshot the proof sheet
+node_modules/
+package.json
+package-lock.json
+
+# build outputs — regenerate with `python3 build.py`
+max-grossman-bag-sticker.html
+proof.html
+proof.png
+print-*.png
+thermal-*.png
+qr-check.png
+
+# upstream font download — archivo-sub.woff2 is the subset we actually use
+archivo.css
+archivo-latin.woff2

@@ -1,0 +1,18 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html",   "x": 0,    "y": 0,   "w": 384, "h": 200, "title": "Label — 48 × 25 mm", "print": "fixed" },
+    { "file": "Seal.dc.html",   "x": 0,    "y": 330, "w": 384, "h": 128, "title": "Seal — 48 × 16 mm, no QR", "print": "fixed" },
+    { "file": "Square.dc.html", "x": 530,  "y": 0,   "w": 384, "h": 384, "title": "Stamp — 48 × 48 mm", "print": "fixed" },
+    { "file": "Tall.dc.html",   "x": 1060, "y": 0,   "w": 384, "h": 512, "title": "Tag — 48 × 64 mm", "print": "fixed" }
+  ],
+  "annotations": [
+    {
+      "id": "print-setup",
+      "x": 1560,
+      "y": 0,
+      "w": 300,
+      "text": "Printing these\n\nDrawn at 8 px = 1 mm, which is 203 dpi — the printer's own resolution. Export an artboard as PNG and drop it into Tiny Print at 100%; don't let it resample.\n\n48 mm is the printable width on a 57 mm roll, so each one is full-bleed edge to edge.\n\nPure black on white, no grey — thermal has no half-tones, and anything grey comes out as a muddy dither.\n\nAll three QRs were checked at true size after a hard black-and-white threshold: they still scan to https://maxgrossman.com."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}
