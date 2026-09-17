@@ -42,6 +42,20 @@ function toISO(d) {
 }
 const fmtDate = (d) => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 const weeksBetween = (a, b) => (b - a) / MS_WEEK;
+
+/* The working week runs Monday to Sunday. Everything about "this week" hangs
+   off that boundary: the bench list is fixed when the week turns over, and
+   what you have made since is measured against the stock counts as they stood
+   that morning. */
+function weekStartOf(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+  return x;
+}
+/* Days still to come, counting today: Monday 7, Sunday 1. Never 0, so the
+   per-day figure never divides by nothing. */
+const daysLeftInWeek = (d) => 7 - ((d.getDay() + 6) % 7);
 const daysBetween = (a, b) => Math.round((b - a) / MS_DAY);
 
 /* Under an hour, say it in minutes. "18 min" is a thing you can picture;
@@ -85,6 +99,8 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const blankState = () => ({
   version: 2,
   settings: { weeklyHours: 8, bufferWeeks: 1, machineHoursPerWeek: 0, updatedAt: 0 },
+  // This week's fixed bench list, plus the stock counts it started from.
+  week: { start: '', plan: {}, startStock: {}, updatedAt: 0 },
   products: [],
   markets: [],
   commissions: [],
@@ -112,6 +128,18 @@ function load() {
   }
 }
 
+/* A plain {id: whole count} map, with anything unparseable dropped. */
+function countMap(o) {
+  const out = {};
+  if (o && typeof o === 'object' && !Array.isArray(o)) {
+    for (const [k, v] of Object.entries(o)) {
+      const n = num(v, NaN);
+      if (Number.isFinite(n)) out[k] = Math.max(0, Math.round(n));
+    }
+  }
+  return out;
+}
+
 function normalize(data, now = Date.now()) {
   const s = blankState();
   if (!data || typeof data !== 'object') return s;
@@ -122,6 +150,14 @@ function normalize(data, now = Date.now()) {
   s.settings.bufferWeeks = num(data.settings?.bufferWeeks, 1);
   s.settings.machineHoursPerWeek = Math.max(0, num(data.settings?.machineHoursPerWeek, 0));
   s.settings.updatedAt = stampOf(data.settings);
+
+  const wk = (data.week && typeof data.week === 'object') ? data.week : {};
+  s.week = {
+    start: typeof wk.start === 'string' ? wk.start : '',
+    plan: countMap(wk.plan),
+    startStock: countMap(wk.startStock),
+    updatedAt: stampOf(wk),
+  };
 
   s.products = (data.products || []).map((p) => ({
     id: p.id || uid(),
@@ -168,6 +204,10 @@ function normalize(data, now = Date.now()) {
 function mergeStates(a, b) {
   const out = blankState();
   out.settings = (num(b.settings?.updatedAt, 0) > num(a.settings?.updatedAt, 0) ? b : a).settings;
+  // The week record is one unit -- last writer wins, like settings. Its
+  // startStock is written once a week and never edited, so the only thing a
+  // clobber can cost is a plan the other device rolled over a moment earlier.
+  out.week = (num(b.week?.updatedAt, 0) > num(a.week?.updatedAt, 0) ? b : a).week;
   for (const key of ['products', 'markets', 'commissions']) {
     const byId = new Map();
     for (const rec of [...(a[key] || []), ...(b[key] || [])]) {
@@ -366,21 +406,81 @@ function computePlan(s) {
     .filter((x) => x.hours > 0)
     .sort((a, b) => b.hours - a.hours);
 
-  const makeHours = sum(weekProducts.map((x) => x.hours));
-  const machineHours = sum(weekProducts.map((x) => x.machineHours));
+  // The bench list is fixed when the week turns over, so that there is
+  // something to burn down. A list recomputed every time you record a finished
+  // piece only ever drifts downward -- it can never say "that's the week done",
+  // which is the question you actually have on a Thursday afternoon.
+  //
+  // What you have made is read straight off the stock counts: today's on-hand
+  // against what it was on Monday morning. Deriving it costs no separate tally
+  // to keep in step, survives a typo being corrected, and merges between two
+  // devices for free, because the stock counts already do.
+  const weekKey = toISO(weekStartOf(now));
+  const weekRec = s.week && s.week.start === weekKey ? s.week : null;
+  const daysLeft = daysLeftInWeek(now);
+  const liveUnits = new Map(weekProducts.map((x) => [x.product.id, x.units]));
+
+  const weekLines = products.map((p) => {
+    // Before the week has been rolled over, the live rate *is* the plan.
+    const planned = weekRec ? Math.max(0, num(weekRec.plan[p.id], 0)) : (liveUnits.get(p.id) || 0);
+    // No snapshot for this one yet -- added part-way through the week -- so
+    // start its count from here, or the stock you already had reads as work.
+    const base = weekRec && weekRec.startStock[p.id] != null ? num(weekRec.startStock[p.id], 0) : p.onHand;
+    const made = Math.max(0, p.onHand - base);
+    const outstanding = perProductToMake.get(p.id) || 0;
+    // Never ask for more than is still owed. A target trimmed mid-week, or an
+    // earlier market covered from stock since Monday, should shrink the week's
+    // remainder rather than strand work nothing is waiting on.
+    const left = Math.min(Math.max(0, planned - made), outstanding);
+    const batchSize = Math.max(1, num(p.batchSize, 1));
+    const each = p.hoursEach;
+    const machineEach = Number(p.machineHoursEach) || 0;
+    return {
+      product: p, batchSize,
+      units: planned, planned, left, made: Math.min(made, planned),
+      runs: batchSize > 1 && left > 0 ? Math.ceil(left / batchSize) : 0,
+      hours: planned * each, leftHours: left * each,
+      machineHours: planned * machineEach, leftMachineHours: left * machineEach,
+    };
+  })
+    .filter((x) => x.planned > 0)
+    .sort((a, b) => b.hours - a.hours);
+
+  const makeHours = sum(weekLines.map((x) => x.hours));
+  const machineHours = sum(weekLines.map((x) => x.machineHours));
+  const leftMakeHours = sum(weekLines.map((x) => x.leftHours));
+  const leftMachineHours = sum(weekLines.map((x) => x.leftMachineHours));
+  // Commission hours are a share of a span of weeks, not a count of things, so
+  // there is nothing to tick off -- they stay on the list until the commission
+  // itself is marked done.
   const commissionHours = sum(weekCommissions.map((x) => x.hours));
+  const plannedHours = makeHours + commissionHours;
+  const leftHours = leftMakeHours + commissionHours;
 
   return {
     now, weeklyHours, bufferWeeks,
     rows, past, committed,
     freeStock: stock,
     thisWeek: {
-      products: weekProducts,
+      weekStart: weekKey, daysLeft,
+      products: weekLines,
+      // The uncommitted rate, for rollWeek to fix as next week's list.
+      liveUnits: Object.fromEntries(liveUnits),
       commissions: weekCommissions,
       makeHours, commissionHours, machineHours,
-      totalHours: makeHours + commissionHours,
+      totalHours: plannedHours,
+      leftMakeHours, leftHours, leftMachineHours,
+      doneHours: Math.max(0, plannedHours - leftHours),
+      // No assumption about which days you are in the shop -- just what is
+      // left, spread over the days that remain.
+      perDayHours: leftHours / daysLeft,
+      unitsPlanned: sum(weekLines.map((x) => x.planned)),
+      unitsMade: sum(weekLines.map((x) => x.made)),
+      unitsLeft: sum(weekLines.map((x) => x.left)),
+      // A whole week's plan against a whole week's hours: no distribution
+      // assumed, so this one stays honest however the week is shaped.
       capacity: weeklyHours,
-      over: makeHours + commissionHours - weeklyHours,
+      over: plannedHours - weeklyHours,
       machineCapacity: machineWeekly,
       machineOver: tracksMachine ? machineHours - machineWeekly : 0,
       tracksMachine,
@@ -391,6 +491,37 @@ function computePlan(s) {
       machineHoursToMake: sum(rows.map((r) => r.makeMachineHours)),
     },
   };
+}
+
+/* Fix this week's bench list, once, on the first load of the week. Returns
+   true when it wrote something, so the caller knows to save and push. */
+function rollWeek(s, plan) {
+  const key = toISO(weekStartOf(plan.now));
+  const products = live(s.products);
+
+  if (!s.week || s.week.start !== key) {
+    const week = { start: key, plan: {}, startStock: {}, updatedAt: Date.now() };
+    for (const x of plan.thisWeek.products) {
+      if (x.planned > 0) week.plan[x.product.id] = x.planned;
+    }
+    for (const p of products) week.startStock[p.id] = p.onHand;
+    s.week = week;
+    return true;
+  }
+
+  let changed = false;
+  for (const p of products) {
+    if (s.week.startStock[p.id] != null) continue;
+    s.week.startStock[p.id] = p.onHand;
+    // Something added part-way through the week still needs bench time, so it
+    // joins this week's list at its own rate. Lines already on the list are
+    // left alone -- a list that stops moving is the whole point.
+    const rate = Math.max(0, num(plan.thisWeek.liveUnits[p.id], 0));
+    if (rate > 0) s.week.plan[p.id] = Math.max(num(s.week.plan[p.id], 0), rate);
+    changed = true;
+  }
+  if (changed) s.week.updatedAt = Date.now();
+  return changed;
 }
 
 /* -------------------------------------------------------------------- views */
@@ -429,16 +560,37 @@ function viewPlan(plan) {
   return out;
 }
 
+/* The week card answers two different questions, and they want different
+ * arithmetic:
+ *
+ *   "Is this week's list bigger than my week?" -- the plan's hours against
+ *   your weekly hours. A whole week against a whole week, so it assumes
+ *   nothing about which days you are actually in the shop.
+ *
+ *   "Where am I up to?" -- the list burnt down against what you have made,
+ *   and what is left spread over the days that remain. There is deliberately
+ *   no "hours spare" figure here: that would mean prorating your week across
+ *   its days, and a maker's hours do not fall evenly -- most of them are at
+ *   the weekend. Hours left, days left and a per-day rate say the same thing
+ *   without pretending to know the shape of your week.
+ */
 function weekCard(plan) {
   const w = plan.thisWeek;
-  const status = w.totalHours === 0 ? 'ok' : w.over > 0.05 ? 'behind' : w.totalHours > w.capacity * 0.85 ? 'tight' : 'ok';
-  const pct = w.capacity > 0 ? Math.min(100, (w.totalHours / w.capacity) * 100) : (w.totalHours > 0 ? 100 : 0);
+  const done = w.totalHours > 0 && w.leftHours <= 0.01;
+  const status = w.totalHours === 0 || done ? 'ok'
+    : w.daysLeft <= 1 ? 'behind'
+    : w.daysLeft <= 2 ? 'tight'
+    : 'ok';
+  // Progress, not load: the bar fills as the list gets made.
+  const pct = w.totalHours > 0 ? Math.min(100, (w.doneHours / w.totalHours) * 100) : 0;
 
   const body = [
     h('div', { class: 'spread' },
       h('h2', { style: 'margin:0;font-size:16px', text: 'This week at the bench' }),
       h('span', { class: `pill ${status}` },
-        w.totalHours === 0 ? 'Clear' : w.over > 0.05 ? `${fmtHours(w.over)} over` : `${fmtHours(w.capacity - w.totalHours)} spare`)),
+        w.totalHours === 0 ? 'Clear'
+          : done ? 'Done'
+          : `${fmtHours(w.perDayHours)}/day`)),
   ];
 
   if (w.totalHours === 0) {
@@ -446,13 +598,15 @@ function weekCard(plan) {
       'Nothing needs to be on the bench this week to hit your targets.'));
   } else {
     body.push(h('ul', { class: 'lines' },
-      w.products.map(({ product, units, hours, runs, batchSize }) => h('li', {},
+      w.products.map(({ product, planned, made, left, leftHours, runs, batchSize }) => h('li', { class: left === 0 ? 'is-done' : '' },
         h('span', { class: 'line-name' },
-          h('b', { text: `${units}×` }), ' ', product.name,
-          runs > 0
-            ? h('span', { class: 'muted tiny', text: ` · ${runs === 1 ? 'one run' : `${runs} runs`} of ${batchSize}` })
-            : null),
-        h('span', { class: 'line-num muted tiny', text: fmtHours(hours) }))),
+          h('b', { text: left > 0 ? `${left}×` : '✓' }), ' ', product.name,
+          made > 0
+            ? h('span', { class: 'muted tiny', text: ` · ${made} of ${planned} done` })
+            : runs > 0
+              ? h('span', { class: 'muted tiny', text: ` · ${runs === 1 ? 'one run' : `${runs} runs`} of ${batchSize}` })
+              : null),
+        h('span', { class: 'line-num muted tiny', text: left > 0 ? fmtHours(leftHours) : 'done' }))),
       w.commissions.map(({ commission, due }) => h('li', {},
         h('span', { class: 'line-name' },
           h('span', { class: 'muted', text: 'commission · ' }), commission.name,
@@ -461,20 +615,26 @@ function weekCard(plan) {
 
     body.push(h('div', { class: `bar ${status}` }, h('i', { style: `width:${pct}%` })));
     body.push(h('p', { class: 'small muted', style: 'margin:8px 0 0' },
-      `${fmtHours(w.totalHours)} of your own time against ${fmtHours(w.capacity)} available`,
-      w.commissionHours > 0 ? ` (${fmtHours(w.commissionHours)} of it commission work)` : '',
-      '.',
-      w.tracksMachine && w.machineHours > 0.01
-        ? ` Plus ${fmtHours(w.machineHours)} on the machine, against ${fmtHours(w.machineCapacity)} of run time — that runs without you.`
+      done
+        ? `This week's list is done — all ${fmtHours(w.totalHours)} of it. Anything further is ahead of schedule.`
+        : `${fmtHours(w.leftHours)} left of ${fmtHours(w.totalHours)}, and ${plural(w.daysLeft, 'day')} to do it in — about ${fmtHours(w.perDayHours)} a day.`,
+      w.commissionHours > 0.01 ? ` ${fmtHours(w.commissionHours)} of the week is commission work.` : '',
+      // Machine time accrues on the clock rather than at the bench, so unlike
+      // your own hours it really does divide evenly across the days.
+      w.tracksMachine && w.leftMachineHours > 0.01
+        ? ` Plus ${fmtHours(w.leftMachineHours)} still to run on the machine — that happens without you.`
         : ''));
     if (w.tracksMachine && w.machineOver > 0.05) {
       body.push(h('div', { class: 'verdict tight' },
         `The machine is ${fmtHours(w.machineOver)} over for the week. Queue a job before you leave in the morning, or add a weekend run.`));
     }
 
-    if (w.over > 0.05) {
+    // Only while there is still work on the bench. Once the list is cleared,
+    // saying the week was too big is just picking an argument with a week you
+    // have already won.
+    if (w.over > 0.05 && !done) {
       body.push(h('div', { class: 'verdict behind' },
-        `You are ${fmtHours(w.over)} short this week. `,
+        `This week's list is ${fmtHours(w.over)} more than your ${fmtHours(w.capacity)} week. `,
         w.commissionHours > 0.01
           ? 'Either find the time, trim a target, or push a commission out — leaving it will cost you at the next market.'
           : 'Either find the time or trim a target — leaving it will cost you at the market.'));
@@ -827,7 +987,7 @@ function marketEditCard(m, r) {
       r.unitsToMake > 0 ? `${plural(r.unitsToMake, 'piece')} to make` : 'covered by stock'),
 
     h('details', {
-      class: 'market-edit', open: isOpen,
+      class: 'market-edit', open: isOpen, 'data-market': m.id,
       ontoggle: (e) => { if (e.target.open) openEditors.add(m.id); else openEditors.delete(m.id); },
     },
       h('summary', { text: `Targets (${Object.keys(m.targets).length} of ${liveProducts().length} items)` }),
@@ -1184,7 +1344,23 @@ function loadStartingSetup() {
 function go(next) { view = next; render(); }
 
 function render() {
-  const plan = computePlan(state);
+  // The <details> toggle event is asynchronous, so typing a target straight
+  // after opening an editor could re-render before the event landed and the
+  // editor would be rebuilt closed under your hands. Read what is actually
+  // open out of the DOM first rather than trusting the event to have arrived.
+  for (const el of document.querySelectorAll('details.market-edit[data-market]')) {
+    const id = el.dataset.market;
+    if (el.open) openEditors.add(id); else openEditors.delete(id);
+  }
+
+  let plan = computePlan(state);
+  // Turning the week over fixes a new bench list, so re-plan once after it.
+  // rollWeek only reports a change the first time, so this cannot loop.
+  if (rollWeek(state, plan)) {
+    save();
+    plan = computePlan(state);
+    if (window.BenchSync) window.BenchSync.notifyLocalChange();
+  }
 
   document.querySelectorAll('#tabs .tab').forEach((btn) => {
     btn.classList.toggle('is-active', btn.dataset.view === view);
@@ -1194,7 +1370,11 @@ function render() {
   const w = plan.thisWeek;
   chip.replaceChildren();
   if (liveProducts().length) {
-    chip.append(h('span', {}, 'this week: ', h('strong', { text: fmtHours(w.totalHours) }), ` of ${fmtHours(w.capacity)}`));
+    chip.append(w.totalHours === 0
+      ? h('span', { text: 'this week: clear' })
+      : w.leftHours <= 0.01
+        ? h('span', { text: 'this week: done' })
+        : h('span', {}, 'this week: ', h('strong', { text: fmtHours(w.leftHours) }), ` left \u00b7 ${plural(w.daysLeft, 'day')}`));
   } else {
     chip.append(h('span', { text: `${fmtHours(plan.weeklyHours)}/week available` }));
   }
