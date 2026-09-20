@@ -103,9 +103,34 @@ figure { margin: 0; }
 }
 .mg-market-none, .mg-market-also { margin: 0 0 var(--space-3); max-width: 62ch; }
 .mg-marketlist-past .mg-market { opacity: .62; box-shadow: none; }
+
+/* A market can carry a booth photo and its own links. Add the photo as a
+   <figure class="mg-market-photo"> after the date block and put
+   mg-market-featured on the article; a market without one is unaffected.
+   The photo sits on white and is never cropped, so odd shapes still fit. */
+.mg-market-featured { grid-template-columns: 92px minmax(220px, 30%) 1fr; }
+.mg-market-photo {
+  margin: 0; border-radius: var(--radius-sm); overflow: hidden;
+  aspect-ratio: 16 / 9; background: #fff; box-shadow: var(--shadow-sm);
+}
+.mg-market-photo img { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; }
+.mg-market-actions {
+  display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-3);
+}
+.mg-market-what .mg-market-actions + p { margin-top: var(--space-2); }
+
 @media (max-width: 720px) {
   .mg-market { grid-template-columns: 68px 1fr; gap: var(--space-3); padding: var(--space-3); }
   .mg-market-day { font-size: 24px; }
+}
+/* Below this the three columns get too tight, so the photo goes full width
+   above the date and the card falls back to the ordinary two-column layout. */
+@media (max-width: 900px) {
+  .mg-market-featured { grid-template-columns: 92px 1fr; }
+  .mg-market-featured .mg-market-photo { grid-column: 1 / -1; order: -1; }
+}
+@media (max-width: 720px) {
+  .mg-market-featured { grid-template-columns: 68px 1fr; }
 }
 
 /* — buttons — */
